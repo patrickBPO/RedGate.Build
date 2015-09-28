@@ -3,7 +3,7 @@
   <metadata>
     <id>RedGate.Build</id>
     <version>0.1.0</version>
-    <title>Red Gate powershell builds building blocks</title>
+    <title />
     <authors>Red Gate Software Ltd</authors>
     <owners>Red Gate Software Ltd</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
