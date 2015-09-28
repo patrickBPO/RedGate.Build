@@ -46,25 +46,25 @@ function Invoke-NUnitForAssembly {
 
   try {
 
+    $NunitArguments = Build-NUnitCommandLineArguments `
+      -AssemblyPath $AssemblyPath `
+      -ExcludedCategories $ExcludedCategories `
+      -IncludedCategories $IncludedCategories
+
+    $NunitExecutable = Get-NUnitConsoleExePath -NUnitVersion $NUnitVersion -x86:$x86.IsPresent
+
     if( $EnableCodeCoverage ) {
 
-      $DotCoverArguments = Build-DotCoverCommandLineArguments -AssemblyPath $AssemblyPath `
-        -ExcludedCategories $ExcludedCategories `
-        -IncludedCategories $IncludedCategories `
-        -DotCoverFilters $DotCoverFilters `
-        -NUnitVersion $NUnitVersion `
-        -x86:$x86.IsPresent
-
-      Execute-Command (Get-DotCoverExePath -DotCoverVersion $DotCoverVersion) $DotCoverArguments
+      Invoke-DotCoverForExecutable `
+        -TargetExecutable $NunitExecutable `
+        -TargetArguments $NunitArguments `
+        -OutputFile "$AssemblyPath.coverage.snap" `
+        -DotCoverVersion $DotCoverVersion `
+        -DotCoverFilters $DotCoverFilters
 
     } else {
 
-      $NunitArguments = Build-NUnitCommandLineArguments `
-        -AssemblyPath $AssemblyPath `
-        -ExcludedCategories $ExcludedCategories `
-        -IncludedCategories $IncludedCategories
-
-      Execute-Command (Get-NUnitConsoleExePath -NUnitVersion $NUnitVersion -x86:$x86.IsPresent) $NunitArguments
+      Execute-Command $NunitExecutable $NunitArguments
 
     }
 
