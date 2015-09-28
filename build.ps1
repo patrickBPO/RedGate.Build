@@ -28,18 +28,18 @@ try {
     "##teamcity[buildNumber '$Version']"
   }
 
-  if(-not (Test-Path .\nuget.exe)) {
-    Invoke-WebRequest -Uri 'https://dist.nuget.org/win-x86-commandline/v3.2.0/nuget.exe' -OutFile .\nuget.exe
+  if(-not (Test-Path .\Private\nuget.exe)) {
+    Invoke-WebRequest -Uri 'https://dist.nuget.org/win-x86-commandline/v3.2.0/nuget.exe' -OutFile .\Private\nuget.exe
   }
 
-  .\nuget.exe pack .\RedGate.Build.nuspec -NoPackageAnalysis -Version $Version
+  .\Private\nuget.exe pack .\RedGate.Build.nuspec -NoPackageAnalysis -Version $Version
   if($LASTEXITCODE -ne 0) {
     throw "Could not nuget pack RedGate.Build. nuget returned exit code $LASTEXITCODE"
   }
 
   if($IsDefaultBranch -and $NugetFeedToPublishTo -and $NugetFeedApiKey) {
     # Let's only push the packages from master when nuget feed info is passed in...
-    .\nuget.exe push .\RedGate.Build.$Version.nupkg -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
+    .\Private\nuget.exe push .\RedGate.Build.$Version.nupkg -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
   }
 
 } finally {
