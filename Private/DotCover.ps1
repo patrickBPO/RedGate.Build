@@ -8,7 +8,7 @@ function Build-DotCoverCommandLineArguments
     [string[]] $IncludedCategories = @(),
     [string] $DotCoverFilters,
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
-    [string] $NUnitVersion = '2.6.2',
+    [string] $NUnitVersion = $DefaultNUnitVersion,
     #If set, return path to nunit-console-x86.exe.
     #By default, use nunit-console.exe
     [switch] $x86
@@ -35,7 +35,7 @@ function Get-DotCoverExePath {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
-    [string] $DotCoverVersion = '3.2.0'
+    [string] $DotCoverVersion = $DefaultDotCoverVersion
   )
 
   Write-Verbose "Using DotCover version $DotCoverVersion"

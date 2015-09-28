@@ -7,3 +7,6 @@ $PackagesDir = New-Item -Path "$PSScriptRoot\..\packages" -ItemType Directory -F
 
 # Store the path to nuget.exe and download it if not available.
 $NugetExe = Resolve-Path "$PSScriptRoot\nuget.exe"
+
+$DefaultNUnitVersion = '2.6.4'
+$DefaultDotCoverVersion ='3.2.0'

@@ -33,7 +33,7 @@ function Get-NUnitConsoleExePath {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
-    [string] $NUnitVersion = '2.6.2',
+    [string] $NUnitVersion = $DefaultNUnitVersion,
 
     #If set, return path to nunit-console-x86.exe.
     #By default, use nunit-console.exe
