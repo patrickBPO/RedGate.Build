@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+  Install a Nuget Package to the RedGate.Build\packages\ folder
+.DESCRIPTION
+  Install a Nuget Package to the RedGate.Build\packages folder
+  and return the full path of the folder where the package was extracted to.
+#>
 function Install-Package {
   [CmdletBinding()]
   param(

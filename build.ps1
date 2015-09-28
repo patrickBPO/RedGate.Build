@@ -1,8 +1,19 @@
+<#
+.SYNOPSIS
+  Pack and Publish RedGate.Build
+.DESCRIPTION
+  1. nuget pack RedGate.Build.nuspec
+  2. If Nuget Feed Url and Api key are passed in, publish the RedGate.Build package
+#>
 [CmdletBinding()]
 param(
+  # The version of the nuget package
   [string] $Version = '0.0.1-dev',
+  # true when building from master. If false, '-prerelease' is appended to the package version
   [bool] $IsDefaultBranch = $False,
+  # Optional: A url to a nuget feed the package will be published to
   [string] $NugetFeedToPublishTo,
+  # Optional: The Api Key that allows pushing to the feed passed in as -NugetFeedToPublishTo
   [string] $NugetFeedApiKey
 )
 

@@ -1,3 +1,26 @@
+<#
+.SYNOPSIS
+  Invoke-Build script to execute tests from a NUnit assembly.
+.DESCRIPTION
+  This script is packaged along with RedGate.Build to make it easy
+  to execute NUnit test assemblies in parallel.
+  It could be used like this from another Invoke-Build script:
+
+  task TestsInParallel {
+    $parallelTasks = @()
+    GEt-ChildItem . -Filter *.Tests.dll | ForEach {
+        $parallelTasks += @{
+          File="packages\RedGate.Buid\tools\scripts\test-singleassembly.ps1"
+          Task='TestSingleAssembly'
+          Parameters= @{
+            AssemblyPath="$OutputDir\$_"
+            ExcludedCategories='Slow','Bugged'
+          }
+        }
+    }
+    Invoke-Builds $parallelTasks
+  }
+#>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]

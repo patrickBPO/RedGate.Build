@@ -1,3 +1,20 @@
+<#
+.SYNOPSIS
+  Execute NUnit tests from a single assembly
+.DESCRIPTION
+  1. Install required Nuget Packages to get nunit-console.exe and dotcover.exe
+  2. Use nunit-console.exe and dotcover.exe to execute NUnit tests with dotcover coverage
+.EXAMPLE
+  Invoke-NUnitForAssembly -AssemblyPath .\bin\debug\test.dll -NUnitVersion '2.6.2' -IncludedCategories 'working'
+    Execute the NUnit tests from test.dll using nunit 2.6.2 (nuget package will be installed if need be.).
+    And pass '/include:working' to nunit-console.exe
+.EXAMPLE
+  Invoke-NUnitForAssembly -AssemblyPath .\bin\debug\test.dll -EnableCodeCoverage
+    Execute the NUnit tests from test.dll and wrap nunit-console.exe with dotcover.exe to provide code coverage.
+    Code coverage report will be saved as .\bin\debug\test.dll.coverage.snap
+.NOTES
+  See also: Merge-CoverageReports
+#>
 function Invoke-NUnitForAssembly {
   [CmdletBinding()]
   param(
@@ -5,7 +22,7 @@ function Invoke-NUnitForAssembly {
     [Parameter(Mandatory=$true)]
     [string] $AssemblyPath,
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
-    [string] $NUnitVersion = '2.6.2',
+    [string] $NUnitVersion = '2.6.4',
     # Whether to use nunit x86 or nunit x64 (default)
     [switch] $x86,
     # A list of excluded test categories
