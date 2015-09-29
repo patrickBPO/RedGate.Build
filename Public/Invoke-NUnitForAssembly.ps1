@@ -64,7 +64,9 @@ function Invoke-NUnitForAssembly {
 
     } else {
 
-      Execute-Command $NunitExecutable $NunitArguments
+      Execute-Command {
+        & $NunitExecutable $NunitArguments
+      }
 
     }
 
