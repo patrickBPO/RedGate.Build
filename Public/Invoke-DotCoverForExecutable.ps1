@@ -37,6 +37,12 @@ function Invoke-DotCoverForExecutable {
     $DotCoverArguments += "/TargetArguments=`"$($TargetArguments -replace '"', '\"')`""
   }
 
-  Execute-Command (Get-DotCoverExePath -DotCoverVersion $DotCoverVersion) $DotCoverArguments
-
+  # Dotcover.exe is not playing well with powershell escaping /TargetArguments="blah blah"
+  # The only way I got it to work so far is to shell out to cmd.exe...
+  $command = "$(Get-DotCoverExePath -DotCoverVersion $DotCoverVersion) $DotCoverArguments"
+  Write-Verbose "Executing $command"
+  cmd.exe /C $command
+  if ($LastExitCode -ne 0) {
+		throw "Command {$command} exited with code $LastExitCode."
+	}
 }
