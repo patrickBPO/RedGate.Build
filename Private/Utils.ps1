@@ -2,24 +2,32 @@
 param()
 
 function Execute-Command {
-  [CmdletBinding()]
+  [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
   param(
+      [Parameter(Mandatory=$true,ParameterSetName='Command')]
       [string] $Command,
+      [Parameter(Mandatory=$true,ParameterSetName='Command')]
       [string[]] $Arguments,
+      [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock',Position=0)]
+      [scriptblock] $ScriptBlock,
       [int[]] $ValidExitCodes=@(0)
   )
 
-  $Command = Resolve-Path $Command
+  if( $PsCmdlet.ParameterSetName -eq 'Command' ) {
 
-  Write-Output @"
-Executing:
-& $Command $Arguments
+    $Command = Resolve-Path $Command
+    Execute-Command -ScriptBlock { & $Command $Arguments } -ValidExitCodes $ValidExitCodes
+
+  } else {
+
+    Write-Verbose @"
+Executing: $ScriptBlock
 "@
 
-  & $Command $Arguments
+    . $ScriptBlock
+  	if ($ValidExitCodes -notcontains $LastExitCode) {
+  		throw "Command {$ScriptBlock} exited with code $LastExitCode."
+  	}
 
-	if ($ValidExitCodes -notcontains $LastExitCode) {
-		throw "Command {$command $arguments} exited with code $LastExitCode."
-	}
-
+  }
 }
