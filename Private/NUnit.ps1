@@ -4,7 +4,8 @@ function Build-NUnitCommandLineArguments {
     [Parameter(Mandatory=$true)]
     [string] $AssemblyPath,
     [string[]] $ExcludedCategories = @(),
-    [string[]] $IncludedCategories = @()
+    [string[]] $IncludedCategories = @(),
+    [string] $TestResultFilenamePattern = 'TestResult'
   )
 
   $additionalParams = @()
@@ -19,7 +20,7 @@ function Build-NUnitCommandLineArguments {
 
   return $AssemblyPath,
     $additionalParams,
-    "/result=`"$AssemblyPath.TestResult.xml`"",
+    "/result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
     '/nologo',
     '/nodots',
     '/noshadow',

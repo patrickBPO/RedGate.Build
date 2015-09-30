@@ -29,6 +29,10 @@ function Invoke-NUnitForAssembly {
     [string[]] $ExcludedCategories = @(),
     # A list of incuded test categories
     [string[]] $IncludedCategories = @(),
+    # The pattern used to generate the test result filename.
+    # For MyAssembly.Test.dll, if TestResultFilenamePattern is 'TestResult',
+    # the test result filename would be 'MyAssembly.Test.dll.TestResult.xml'
+    [string] $TestResultFilenamePattern = 'TestResult',
     # If set, enable code coverage using dotcover
     [bool] $EnableCodeCoverage = $false,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
@@ -36,7 +40,7 @@ function Invoke-NUnitForAssembly {
     # The dotcover filters passed to dotcover.exe
     [string] $DotCoverFilters = '',
     # If set, do not import test results automatically to Teamcity.
-    # In this case it is the responsibility of the caller to call 'TeamCity-ImportNUnitReport "$AssemblyPath.TestResult.xml"'
+    # In this case it is the responsibility of the caller to call 'TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"'
     [switch] $DotNotImportResultsToTeamcity
   )
 
@@ -49,7 +53,8 @@ function Invoke-NUnitForAssembly {
     $NunitArguments = Build-NUnitCommandLineArguments `
       -AssemblyPath $AssemblyPath `
       -ExcludedCategories $ExcludedCategories `
-      -IncludedCategories $IncludedCategories
+      -IncludedCategories $IncludedCategories `
+      -TestResultFilenamePattern $TestResultFilenamePattern
 
     $NunitExecutable = Get-NUnitConsoleExePath -NUnitVersion $NUnitVersion -x86:$x86.IsPresent
 
@@ -72,7 +77,7 @@ function Invoke-NUnitForAssembly {
 
   } finally {
     if(-not $DotNotImportResultsToTeamcity.IsPresent) {
-      TeamCity-ImportNUnitReport "$AssemblyPath.TestResult.xml"
+      TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"
     }
   }
 
