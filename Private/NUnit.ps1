@@ -8,18 +8,7 @@ function Build-NUnitCommandLineArguments {
     [string] $TestResultFilenamePattern = 'TestResult'
   )
 
-  $additionalParams = @()
-  #build the /exclude param:
-  if($ExcludedCategories) {
-    $additionalParams += "/exclude:" + ($ExcludedCategories -join ';')
-  }
-
-  if($IncludedCategories) {
-    $additionalParams += "/include:" + ($IncludedCategories -join ';')
-  }
-
-  return $AssemblyPath,
-    $additionalParams,
+  $nugetParams = $AssemblyPath,
     "/result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
     '/nologo',
     '/nodots',
@@ -28,6 +17,17 @@ function Build-NUnitCommandLineArguments {
     "/out:`"$AssemblyPath.TestOutput.txt`"",
     "/err:`"$AssemblyPath.TestError.txt`""
 
+  #add the /exclude param if $ExcludedCategories is not empty:
+  if($ExcludedCategories) {
+    $nugetParams += "/exclude:$($ExcludedCategories -join ';')"
+  }
+
+  #add the /include param if $IncludedCategories is not empty:
+  if($IncludedCategories) {
+    $nugetParams += "/include:$($IncludedCategories -join ';')"
+  }
+
+  return $nugetParams
 }
 
 function Get-NUnitConsoleExePath {
