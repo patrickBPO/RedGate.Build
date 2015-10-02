@@ -14,8 +14,8 @@ function Build-NUnitCommandLineArguments {
     '/nodots',
     '/noshadow',
     '/labels',
-    "/out:`"$AssemblyPath.TestOutput.txt`"",
-    "/err:`"$AssemblyPath.TestError.txt`""
+    "/out:`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
+    "/err:`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
 
   #add the /exclude param if $ExcludedCategories is not empty:
   if($ExcludedCategories) {

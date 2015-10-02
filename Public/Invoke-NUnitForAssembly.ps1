@@ -79,6 +79,10 @@ function Invoke-NUnitForAssembly {
     if(-not $DotNotImportResultsToTeamcity.IsPresent) {
       TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"
     }
+
+    # Tell teamcity to keep our test output logs as well. This could come in handy
+    $assemblyFilename = Split-Path $AssemblyPath -Leaf
+    TeamCity-PublishArtifact "$AssemblyPath.$TestResultFilenamePattern.* => logs/tests/$assemblyFilename.$TestResultFilenamePattern/logs.zip"
   }
 
 }
