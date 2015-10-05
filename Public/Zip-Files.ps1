@@ -48,7 +48,9 @@ function Zip-Files {
       if($BasePath) {
         $destination = $_.Path -replace ([Regex]::Escape($BasePath)), $tempFolder
       }
-      Copy-Item $_.Path -Destination $destination -Recurse
+      # Make sure the destination parent folder exists...
+      New-Item (Split-Path $Destination) -ItemType Directory -Force | Out-Null
+      Copy-Item $_.Path -Destination $destination -Recurse -Force
     }
 
     Write-Verbose "Zipping to $OutputFile"
