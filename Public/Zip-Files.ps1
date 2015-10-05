@@ -30,14 +30,18 @@ function Zip-Files {
     [string] $BasePath
   )
 
+  # Copy the files matching $Files to a temp folder so that
+  # we can easily 7zip it and preserve directory paths.
   $tempFolder = Join-Path -Path $env:Temp -ChildPath ([System.IO.Path]::GetRandomFileName())
   try {
-    $tempFolder = New-Item $tempFolder -ItemType Directory -verbose
+    Write-Verbose "Creating folder: $tempFolder"
+    $tempFolder = New-Item $tempFolder -ItemType Directory
 
     $7ZipExe = Get-7ZipExePath
 
     if(Test-Path $OutputFile) {
-      Remove-Item $OutputFile -Force -verbose
+      Write-Verbose "Remove existing (previous?) file $OutputFile"
+      Remove-Item $OutputFile -Force
     }
 
     Resolve-Path $Files | ForEach {
@@ -47,11 +51,13 @@ function Zip-Files {
       Copy-Item $_.Path -Destination $destination -Recurse
     }
 
+    Write-Verbose "Zipping to $OutputFile"
     Execute-Command {
-      & $7ZipExe a -r $OutputFile "$tempFolder\*"
+      & $7ZipExe a -r $OutputFile "$tempFolder\*" | Write-Verbose
     }
   } finally {
-    Remove-Item $tempFolder -Force -Recurse -verbose -ErrorACtion SilentlyContinue
+    Write-Verbose "Deleting folder: $tempFolder"
+    Remove-Item $tempFolder -Force -Recurse -ErrorACtion SilentlyContinue
   }
 
 }
