@@ -16,7 +16,11 @@ function Invoke-SmartAssembly {
     [Parameter(Mandatory=$true)]
     [string] $ProjectPath,
     # The version of the nuget package containing the Smart Assembly executables
-    [string] $SmartAssemblyVersion = $DefaultSmartAssemblyVersion
+    [string] $SmartAssemblyVersion = $DefaultSmartAssemblyVersion,
+    # Specify the input assembly filename
+    [string] $InputFilename,
+    # Specify the output assembly filename
+    [string] $OutputFilename
   )
 
   $ProjectPath = Resolve-Path $ProjectPath
@@ -25,8 +29,17 @@ function Invoke-SmartAssembly {
 
   $saComPath = Get-SmartAssemblyComPath -SmartAssemblyVersion $SmartAssemblyVersion
 
+  $saArguments = '/build', $ProjectPath
+
+  if($InputFilename){
+    $saArguments += "/input=$InputFilename"
+  }
+  if($OutputFilename){
+    $saArguments += "/output=$OutputFilename"
+  }
+
   Execute-Command {
-    & $saComPath $ProjectPath
+    & $saComPath $saArguments
   }
 
 }
