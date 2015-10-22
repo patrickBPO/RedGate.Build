@@ -21,9 +21,11 @@ function Add-ToHashTableIfNotNull {
 function Sign-Assembly {
   [CmdletBinding()]
   param(
+    # The name of the server doing the signing
     [Parameter(Mandatory=$true)]
     [string] $Server,
 
+    # The path to the assembly to be signed. This file will be updated.
     [Parameter(Mandatory=$true)]
     [string] $AssemblyFilename,
 
