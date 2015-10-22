@@ -21,10 +21,9 @@ function Add-ToHashTableIfNotNull {
 function Sign-Assembly {
   [CmdletBinding()]
   param(
-    # The base Url of the web service doing the signing
+    # The Url of the web service doing the signing
     # e.g. https://myserver.com/ or http://myoverserver.org:1234/
-    [Parameter(Mandatory=$true)]
-    [string] $ServerBaseUrl,
+    [string] $SigningServiceUrl = $env:SigningServiceUrl,
 
     # The path to the assembly to be signed. This file will be updated.
     [Parameter(Mandatory=$true)]
@@ -37,7 +36,9 @@ function Sign-Assembly {
     [string] $MoreInfoUrl = 'http://www.red-gate.com'
   )
 
-  $Url = "$ServerBaseUrl/Sign"
+  if([String]::IsNullOrEmpty($SigningServiceUrl)) {
+    throw 'Cannot sign assembly. -SigningServiceUrl was not specified and the SigningServiceUrl environment variable is not set.'
+  }
 
   $Headers = @{ 'FileType' =  $FileType };
   Add-ToHashTableIfNotNull $Headers -Key 'Certificate' -Value $Certificate
@@ -45,11 +46,11 @@ function Sign-Assembly {
   Add-ToHashTableIfNotNull $Headers -Key 'MoreInfoUrl' -Value $MoreInfoUrl
   Add-ToHashTableIfNotNull $Headers -Key 'ReCompressZip' -Value $ReCompressZip
 
-  Write-Verbose "Signing $AssemblyFilename using $Url"
+  Write-Verbose "Signing $AssemblyFilename using $SigningServiceUrl"
   $Headers.Keys | ForEach { Write-Verbose "`t $_`: $($Headers[$_])" }
 
   Invoke-WebRequest `
-    -Uri $Url `
+    -Uri $SigningServiceUrl `
     -InFile $AssemblyFilename `
     -OutFile $AssemblyFilename `
     -Method Post `
