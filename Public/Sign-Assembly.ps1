@@ -21,9 +21,10 @@ function Add-ToHashTableIfNotNull {
 function Sign-Assembly {
   [CmdletBinding()]
   param(
-    # The name of the server doing the signing
+    # The base Url of the web service doing the signing
+    # e.g. https://myserver.com/ or http://myoverserver.org:1234/
     [Parameter(Mandatory=$true)]
-    [string] $Server,
+    [string] $ServerBaseUrl,
 
     # The path to the assembly to be signed. This file will be updated.
     [Parameter(Mandatory=$true)]
@@ -36,7 +37,7 @@ function Sign-Assembly {
     [string] $MoreInfoUrl = 'http://www.red-gate.com'
   )
 
-  $Url = "http://$Server/Sign"
+  $Url = "$ServerBaseUrl/Sign"
 
   $Headers = @{ 'FileType' =  $FileType };
   Add-ToHashTableIfNotNull $Headers -Key 'Certificate' -Value $Certificate
