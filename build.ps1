@@ -29,7 +29,9 @@ try {
   }
 
   if(-not (Test-Path .\Private\nuget.exe)) {
-    Invoke-WebRequest -Uri 'https://dist.nuget.org/win-x86-commandline/v3.2.0/nuget.exe' -OutFile .\Private\nuget.exe
+    $nugetUrl = 'https://dist.nuget.org/win-x86-commandline/v3.2.0/nuget.exe'
+    "Downloading $nugetUrl to .\Private\nuget.exe"
+    (New-Object Net.WebClient).DownloadFile($nugetUrl, "$PSScriptRoot\Private\nuget.exe")
   }
 
   .\Private\nuget.exe pack .\RedGate.Build.nuspec -NoPackageAnalysis -Version $Version
