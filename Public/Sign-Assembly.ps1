@@ -44,6 +44,9 @@ function Sign-Assembly {
   Add-ToHashTableIfNotNull $Headers -Key 'MoreInfoUrl' -Value $MoreInfoUrl
   Add-ToHashTableIfNotNull $Headers -Key 'ReCompressZip' -Value $ReCompressZip
 
+  Write-Verbose "Signing $AssemblyFilename using $Url"
+  $Headers.Keys | ForEach { Write-Verbose "`t $_`: $($Headers[$_])" }
+
   Invoke-WebRequest `
     -Uri $Url `
     -InFile $AssemblyFilename `
