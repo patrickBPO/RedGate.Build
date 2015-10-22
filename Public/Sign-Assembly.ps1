@@ -31,9 +31,9 @@ function Sign-Assembly {
 
     [string] $FileType = 'Exe',
     [string] $ReCompressZip,
-    [string] $Certificate,
-    [string] $Description,
-    [string] $MoreInfoUrl
+    [string] $Certificate = 'Master',
+    [string] $Description = 'Red Gate Software Ltd.',
+    [string] $MoreInfoUrl = 'http://www.red-gate.com'
   )
 
   $Url = "http://$Server/Sign"
