@@ -36,6 +36,9 @@ function Add-ToHashTableIfNotNull {
 
     .PARAMETER ReCompressZip
     This is a throwover from the C# implementation. It corresponds to the 'ReCompressZip' request header. Any idea what it does?
+
+    .OUTPUT
+    The AssemblyPath parameter, to enable call chaining.
 #>
 function Invoke-AssemblySigning {
   [CmdletBinding()]
