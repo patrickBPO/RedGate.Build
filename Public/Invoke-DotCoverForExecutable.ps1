@@ -1,48 +1,65 @@
 <#
 .SYNOPSIS
-  Performs coverage analysis of the specified application
+  Performs coverage analysis of a .NET application.
+
 .DESCRIPTION
-  Use 'dotcover.exe cover' to perform coverage analysis of the specified executable
+  Use 'dotcover.exe' to perform coverage analysis of the specified .NET executable.
+
+.PARAMETER TargetExecutable
+  The path of the target executable.
+
+.PARAMETER TargetArguments
+  The arguments to pass to the target executable.
+
+.PARAMETER OutputFile
+  The output XML file containing the detailed coverage information.
+
+.PARAMETER DotCoverVersion
+  The version of dotCover nuget package to use.
+
+.PARAMETER DotCoverFilters
+  Coverage filters for dotCover, to indicate what should and should not be covered.
 #>
 function Invoke-DotCoverForExecutable {
   [CmdletBinding()]
   param(
-    # File name of the program to analyse
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $True)]
     [string] $TargetExecutable,
-    # Arguments of the program to analyse (Optional)
+
+    [Parameter(Mandatory = $False)]
     [string[]] $TargetArguments,
-    # Output Coverage file
-    [Parameter(Mandatory=$true)]
+
+    [Parameter(Mandatory = $True)]
     [string] $OutputFile,
-    # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
+
+    [Parameter(Mandatory = $False)]
     [string] $DotCoverVersion = $DefaultDotCoverVersion,
-    # The dotcover filters passed to dotcover.exe
+
+    [Parameter(Mandatory = $False)]
     [string] $DotCoverFilters = ''
   )
 
-  # TODO: better escaping of TargetArguments
-
-  if( $DotCoverFilters) {
-    $DotCoverFilters = "/Filters=$DotCoverFilters"
-  }
-
-  $DotCoverArguments = "cover",
-    "/TargetExecutable=`"$TargetExecutable`"",
-    "/Output=`"$OutputFile`"",
-    $DotCoverFilters,
+  $DotCoverArguments = @(
+    'cover',
+    "/TargetExecutable=$TargetExecutable",
+    "/Output=$OutputFile",
     '/ReturnTargetExitCode'
+  )
 
-  if($TargetArguments) {
-    $DotCoverArguments += "/TargetArguments=`"$($TargetArguments -replace '"', '\"')`""
+  if (![string]::IsNullOrWhiteSpace($DotCoverFilters)) {
+    $DotCoverArguments += "/Filters=$DotCoverFilters"
   }
 
-  # Dotcover.exe is not playing well with powershell escaping /TargetArguments="blah blah"
-  # The only way I got it to work so far is to shell out to cmd.exe...
-  $command = "$(Get-DotCoverExePath -DotCoverVersion $DotCoverVersion) $DotCoverArguments"
-  Write-Verbose "Executing $command"
-  cmd.exe /C $command
+  if ($TargetArguments) {
+    $EscapedArguments = ConvertTo-ShellEscaped $TargetArguments
+    $DotCoverArguments += "/TargetArguments=$TargetArguments"
+  }
+
+  $DotCoverPath = Get-DotCoverExePath -DotCoverVersion $DotCoverVersion
+
+  & $DotCoverPath $DotCoverArguments
+
   if ($LastExitCode -ne 0) {
-		throw "Command {$command} exited with code $LastExitCode."
-	}
+    throw "dotCover exited with code $LastExitCode."
+  }
 }
