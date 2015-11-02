@@ -14,13 +14,15 @@ function Add-ToHashTableIfNotNull {
 
 <#
     .SYNOPSIS
-    Signs a .NET assembly.
+    Signs a .NET assembly, jar file, VSIX installer or ClickOnce application.
 
     .DESCRIPTION
-    Signs a .NET assembly executable or dll.
+    Signs a .NET assembly, jar file, VSIX installer or ClickOnce application using the Redgate signing service.
 
-    .PARAMETER AssemblyPath
-    The path of the assembly to be signed. The assembly will me updated in place with a digital signature.
+    .PARAMETER FilePath
+    The path of the file to be signed. The file will me updated in place with a corresponding signed version.
+    The path may reference a .NET assembly (.exe or .dll), a java Jar file, a Visual Studio Installer (.vsix) or a .NET ClickOnce application (.application).
+    This parameter has several aliases (JarPath, VsixPath, ClickOnceApplicationPath and AssemblyPath) to help improve readability of your scripts.
 
     .PARAMETER SigningServiceUrl
     The url of the signing service. If unspecified, defaults to the $env:SigningServiceUrl environment variable.
@@ -34,18 +36,27 @@ function Add-ToHashTableIfNotNull {
     .PARAMETER MoreInfoUrl
     An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
 
-    .PARAMETER ReCompressZip
-    For files of type '.vsix' only, this indicates whether or not the file should be unpacked and recompressed. Under recompression, the overall
-    compression level is set to high [ZipOutputStream.SetLevel(9)] and the compression method for each entry is set to 'Deflated'.
-
     .OUTPUT
-    The AssemblyPath parameter, to enable call chaining.
+    The FilePath parameter, to enable call chaining.
+
+    .EXAMPLE
+    $AssemblyPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.dll"
+    Invoke-SigningService -SigningServiceUrl 'https://signingservice.internal/sign' -AssemblyPath $AssemblyPath
+
+    This shows how to sign a .NET dll, with the signing service URL being explicitly stated.
+
+    .EXAMPLE
+    $VsixPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.Installer.vsix"
+    Invoke-SigningService -VsixPath $AssemblyPath
+
+    This shows how to sign a Visual Studio Installer file. The signing service URL is taken from the $env:SigningServiceUrl environment variable that is present on all of the build agents.
 #>
-function Invoke-AssemblySigning {
+function Invoke-SigningService {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
-    [string] $AssemblyPath,
+    [Alias('JarPath', 'VsixPath', 'ClickOnceApplicationPath', 'AssemblyPath')]
+    [string] $FilePath,
 
     [Parameter(Mandatory = $False)]
     [string] $SigningServiceUrl = $env:SigningServiceUrl,
@@ -57,23 +68,20 @@ function Invoke-AssemblySigning {
     [string] $Description = 'Red Gate Software Ltd.',
 
     [Parameter(Mandatory = $False)]
-    [string] $MoreInfoUrl = 'http://www.red-gate.com',
-
-    [Parameter(Mandatory = $False)]
-    [string] $ReCompressZip
+    [string] $MoreInfoUrl = 'http://www.red-gate.com'
   )
 
   # Simple error checking.
   if ([String]::IsNullOrEmpty($SigningServiceUrl)) {
     throw 'Cannot sign assembly. -SigningServiceUrl was not specified and the SigningServiceUrl environment variable is not set.'
   }
-  if (!(Test-Path $AssemblyPath)) {
-    throw "Assembly not found: $AssemblyPath"
+  if (!(Test-Path $FilePath)) {
+    throw "File not found: $FilePath"
   }
 
   # Determine the file type.
   $FileType = $Null
-  switch ([System.IO.Path]::GetExtension($AssemblyPath)) {
+  switch ([System.IO.Path]::GetExtension($FilePath)) {
     '.exe' { $FileType = 'Exe' }
     '.dll' { $FileType = 'Exe' }
     '.vsix' { $FileType = 'Vsix' }
@@ -82,24 +90,25 @@ function Invoke-AssemblySigning {
     default { throw "Unsupported file type: $AssemblyPath" }
   } 
 
+  # Make the web request to the signing service.
   $Headers = @{};
   Add-ToHashTableIfNotNull $Headers -Key 'FileType' -Value $FileType
   Add-ToHashTableIfNotNull $Headers -Key 'Certificate' -Value $Certificate
   Add-ToHashTableIfNotNull $Headers -Key 'Description' -Value $Description
   Add-ToHashTableIfNotNull $Headers -Key 'MoreInfoUrl' -Value $MoreInfoUrl
-  Add-ToHashTableIfNotNull $Headers -Key 'ReCompressZip' -Value $ReCompressZip
 
-  Write-Verbose "Signing $AssemblyPath using $SigningServiceUrl"
+  Write-Verbose "Signing $FilePath using $SigningServiceUrl"
   $Headers.Keys | ForEach { Write-Verbose "`t $_`: $($Headers[$_])" }
 
   $Response = Invoke-WebRequest `
     -Uri $SigningServiceUrl `
-    -InFile $AssemblyPath `
-    -OutFile $AssemblyPath `
+    -InFile $FilePath `
+    -OutFile $FilePath `
     -Method Post `
     -ContentType 'binary/octet-stream' `
     -Headers $Headers
-  # TODO: How should we check the response?
 
-  return $AssemblyPath
+  # TODO: How should we check the response? Need to fail if the signing failed.
+
+  return $FilePath
 }
