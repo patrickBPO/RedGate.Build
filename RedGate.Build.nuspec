@@ -13,6 +13,10 @@
     <dependencies />
   </metadata>
   <files>
-    <file src="**" target="tools" exclude="nuget.exe;*.nuspec;*.nupkg;build.ps1;.*" />
+    <file src="Private\*.ps1" target="tools\Private" />
+    <file src="Private\*.psm1" target="tools\Private" />
+    <file src="Public\*.ps1" target="tools\Public" />
+    <file src="LICENSE.md" target="tools" />
+    <file src="*.psm1" target="tools" />
   </files>
 </package>
