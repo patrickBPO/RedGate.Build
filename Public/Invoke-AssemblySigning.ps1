@@ -35,7 +35,8 @@ function Add-ToHashTableIfNotNull {
     An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
 
     .PARAMETER ReCompressZip
-    This is a throwover from the C# implementation. It corresponds to the 'ReCompressZip' request header. Any idea what it does?
+    For files of type '.vsix' only, this indicates whether or not the file should be unpacked and recompressed. Under recompression, the overall
+    compression level is set to high [ZipOutputStream.SetLevel(9)] and the compression method for each entry is set to 'Deflated'.
 
     .OUTPUT
     The AssemblyPath parameter, to enable call chaining.
@@ -74,7 +75,10 @@ function Invoke-AssemblySigning {
   $FileType = $Null
   switch ([System.IO.Path]::GetExtension($AssemblyPath)) {
     '.exe' { $FileType = 'Exe' }
-    '.dll' { $FileType = 'Dll' }
+    '.dll' { $FileType = 'Exe' }
+    '.vsix' { $FileType = 'Vsix' }
+    '.jar' { $FileType = 'Jar' }
+    '.application' { $FileType = 'ClickOnce' }
     default { throw "Unsupported file type: $AssemblyPath" }
   } 
 
