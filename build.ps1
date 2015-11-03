@@ -90,7 +90,7 @@ try {
   if(-not (Test-Path $NuGetPath) -or (Get-Item $NuGetPath).VersionInfo.ProductVersion -ne $NuGetVersion) {
     $NuGetUrl = "https://dist.nuget.org/win-x86-commandline/v$NuGetVersion/nuget.exe"
     Write-Host "Downloading $nugetUrl to $NuGetPath"
-    Invoke-WebRequest $NuGetUrl -OutFile $NuGetPath
+    (New-Object Net.WebClient).DownloadFile($NuGetUrl, $NuGetPath) # Significantly faster than Invoke-WebRequest.
   } else {
     Write-Host "$NuGetPath is present and is the correct version ($NuGetVersion)"
   }
