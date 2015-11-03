@@ -33,11 +33,14 @@ param(
   [string] $NugetFeedApiKey
 )
 
+
 $ErrorActionPreference = 'Stop'
 
+
 function Write-Info($Message) {
-    Write-Host $Message -Foreground Magenta
+    Write-Host "#### $Message ####" -ForegroundColor Yellow
 }
+
 
 Push-Location $PSScriptRoot
 try {
@@ -55,10 +58,20 @@ try {
     Write-Host "Deleting $NuGetPackagePath"
     Remove-Item $NuGetPackagePath
   }
+  if (Get-Module Pester)
+  {
+    Write-Host 'Removing Pester module'
+    Remove-Module Pester
+  }
   $PesterPackagePath = '.\Pester'
   if (Test-Path $PesterPackagePath) {
     Write-Host "Deleting $PesterPackagePath"
     Remove-Item $PesterPackagePath -Force -Recurse
+  }
+  if (Get-Module 'RedGate.Build')
+  {
+    Write-Host 'Removing RedGate.Build module'
+    Remove-Module 'RedGate.Build'
   }
 
   # Download NuGet if necessary.
@@ -80,11 +93,22 @@ try {
     throw "Could not nuget pack RedGate.Build. nuget returned exit code $LASTEXITCODE"
   }
   $Null = $NuGetPackagePath | Resolve-Path # Further verify that the package was built.
-  
+
   # Obtain Pester.
   Write-Info 'Obtaining Pester'
   & $NuGetPath install Pester -Version 3.3.11 -OutputDirectory . -ExcludeVersion -PackageSaveMode nuspec
-  $PesterModulePath = "$PesterPackagePath\tools\Pester.psm1" | Resolve-Path
+  Import-Module "$PesterPackagePath\tools\Pester.psm1" | Resolve-Path
+
+  # Import the RedGate.Build module.
+  Write-Info 'Importing the RedGate.Build module'
+  Import-Module .\RedGate.Build.psm1
+  
+  # Run Pester tests.
+  Write-Info 'Running Pester tests'
+  Invoke-Pester -Script .\Tests\*.Tests.ps1
+  if($LASTEXITCODE -ne 0) {
+    throw 'One or more tests failed.'
+  }
 
   # Publish the NuGet package.
   Write-Info 'Publishing RedGate.Build NuGet package'
