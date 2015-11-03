@@ -68,6 +68,12 @@ try {
     Write-Host "Deleting $PesterPackagePath"
     Remove-Item $PesterPackagePath -Force -Recurse
   }
+  $PesterResultsPath = '.\TestResults.xml'
+  if (Test-Path $PesterResultsPath)
+  {
+    Write-Host "Deleting $PesterResultsPath"
+    Remove-Item $PesterResultsPath
+  }
   if (Get-Module 'RedGate.Build')
   {
     Write-Host 'Removing RedGate.Build module'
@@ -105,7 +111,7 @@ try {
   
   # Run Pester tests.
   Write-Info 'Running Pester tests'
-  Invoke-Pester -Script .\Tests\*.Tests.ps1
+  Invoke-Pester -Script .\Tests\*.Tests.ps1 -OutputFile $PesterResultsPath -OutputFormat NUnitXml
   if($LASTEXITCODE -ne 0) {
     throw 'One or more tests failed.'
   }

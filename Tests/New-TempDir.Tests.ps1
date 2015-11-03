@@ -14,9 +14,5 @@ Describe 'New-TempDir' {
         It 'should exist' {
             $TempDir | Should Exist
         }
-
-        It 'should reside inside "%TEMP%\RedGate.Build"' {
-            ([System.IO.Path]::GetDirectoryName($TempDir)) | Should Be "$env:TEMP\RedGate.Build"
-        }
     }
 }
