@@ -44,11 +44,14 @@ function Write-Info($Message) {
 
 Push-Location $PSScriptRoot
 try {
+  # Import the TeamCity module.
+  Import-Module '.\Private\teamcity.psm1'
+
   if(!$IsDefaultBranch) {
     # If we are not building from master, append '-prerelease' to the package version
     $Version = "$Version-prerelease"
     # let TC know
-    "##teamcity[buildNumber '$Version']"
+    TeamCity-SetBuildNumber($Version)
   }
   
   # Clean any previous build output.
@@ -112,7 +115,12 @@ try {
   # Run Pester tests.
   Write-Info 'Running Pester tests'
   Invoke-Pester -Script .\Tests\*.Tests.ps1 -OutputFile $PesterResultsPath -OutputFormat NUnitXml
-  if($LASTEXITCODE -ne 0) {
+  if (!(Test-Path $PesterResultsPath)) {
+    throw 'Pester tests results file unavailable'
+  }
+  TeamCity-ImportNUnitReport($PesterResultsPath | Resolve-Path)
+  $TestResults = ([xml](Get-Content $PesterResultsPath)).'test-results'
+  if($TestResults.Errors -ne '0' -or $TestResults.Failures -ne '0') {
     throw 'One or more tests failed.'
   }
 
