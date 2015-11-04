@@ -129,7 +129,7 @@ try {
   if($IsDefaultBranch -and $NugetFeedToPublishTo -and $NugetFeedApiKey) {
     Write-Host 'Running NuGet publish'
     # Let's only push the packages from master when nuget feed info is passed in...
-    & $NuGet push $NuGetPackagePath -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
+    & $NuGetPath push $NuGetPackagePath -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
   } else {
     Write-Host 'Publish skipped'
   }
