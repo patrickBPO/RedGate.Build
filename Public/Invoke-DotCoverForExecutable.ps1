@@ -51,8 +51,8 @@ function Invoke-DotCoverForExecutable {
   }
 
   if ($TargetArguments) {
-    $EscapedArguments = ConvertTo-ShellEscaped $TargetArguments
-    $DotCoverArguments += "/TargetArguments=$TargetArguments"
+    $EscapedTargetArguments = ConvertTo-ShellEscaped $TargetArguments
+    $DotCoverArguments += "/TargetArguments=$EscapedTargetArguments"
   }
 
   $DotCoverPath = Get-DotCoverExePath -DotCoverVersion $DotCoverVersion
