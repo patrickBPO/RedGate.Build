@@ -30,6 +30,7 @@ function ConvertTo-ShellEscaped
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $True, Position = 0, ValueFromPipeLine = $True)]
+        [AllowEmptyString()]
         [string[]] $Arguments
     )
 
