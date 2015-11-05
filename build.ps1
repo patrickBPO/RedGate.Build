@@ -45,7 +45,8 @@ function Write-Info($Message) {
 Push-Location $PSScriptRoot
 try {
   # Import the TeamCity module.
-  Import-Module '.\Private\teamcity.psm1'
+  Write-Info 'Importing TeamCity module'
+  Import-Module '.\Private\teamcity.psm1' -DisableNameChecking
 
   if(!$IsDefaultBranch) {
     # If we are not building from master, append '-prerelease' to the package version
