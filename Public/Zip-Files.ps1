@@ -34,8 +34,6 @@ function Zip-Files {
   # we can easily 7zip it and preserve directory paths.
   $tempFolder = New-TempDir
   try {
-    $tempFolder = New-Item $tempFolder -ItemType Directory
-
     $7ZipExe = Get-7ZipExePath
 
     if(Test-Path $OutputFile) {
