@@ -12,7 +12,7 @@ function Get-DependencyVersionRange
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $True, Position = 0, ValueFromPipeLine = $True)]
         [ValidateNotNullOrEmpty()]
         [string] $Version
     )
