@@ -24,6 +24,8 @@ function Update-NuspecDependenciesVersions {
         # Load the nuget packages
         $nugetPackages = Get-NugetPackagesFromConfigFiles -PackagesConfigPaths $PackagesConfigPaths
 
+        Test-NugetPackagesVersionsAreConsistent -NugetPackages $nugetPackages
+
         # Add/Override packages using versions from $PackageVersionOverride
         if( $PackageVersionOverride ) {
             $PackageVersionOverride.Keys | ForEach {
