@@ -36,7 +36,7 @@ function Add-ToHashTableIfNotNull {
     .PARAMETER MoreInfoUrl
     An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
 
-    .OUTPUT
+    .OUTPUTS
     The FilePath parameter, to enable call chaining.
 
     .EXAMPLE
