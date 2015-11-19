@@ -22,23 +22,7 @@ function Test-NugetPackagesVersionsAreConsistent {
     [string[]] $PackagesConfigPaths
   )
 
-  $packagesConfigs = @(Resolve-Path $PackagesConfigPaths)
-
-  $nugetPackages = $packagesConfigs | ForEach {
-    # get the nuget packages from the package config file
-    ([xml](Get-Content $_)).packages.package | ForEach {
-      [pscustomobject] @{
-        Id=$_.id
-        Version=$_.version
-      }
-    }
-  } | Sort Id, Version -Unique
-
-  Write-Verbose @"
-All nuget packages found:
-
-$($nugetPackages | Out-String)
-"@
+  $nugetPackages = Get-NugetPackagesFromConfigFiles -PackagesConfigPaths $packagesConfigs
 
   # Get all packages that have more than 1 version.
   $packagesWithInconsistentVersions = $nugetPackages | where { $id = $_.Id; return @($nugetPackages | ? id -eq $id ).count -gt 1 }
