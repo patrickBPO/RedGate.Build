@@ -115,7 +115,7 @@ try {
   
   # Run Pester tests.
   Write-Info 'Running Pester tests'
-  Invoke-Pester -Script .\Tests\*.Tests.ps1 -OutputFile $PesterResultsPath -OutputFormat NUnitXml
+  Invoke-Pester -Script .\Tests\ -OutputFile $PesterResultsPath -OutputFormat NUnitXml
   if (!(Test-Path $PesterResultsPath)) {
     throw 'Pester tests results file unavailable'
   }
