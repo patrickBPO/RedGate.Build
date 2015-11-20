@@ -80,6 +80,12 @@ function Invoke-SigningService {
             throw "File not found: $FilePath"
         }
 
+        # Only sign the file if it does not already have a valid Authenticode signature
+        if((Get-AuthenticodeSignature $FilePath).Status -eq 'Valid') {
+            Write-Verbose "Skipping signing $FilePath. It is already signed"
+            return $FilePath
+        }
+
         # Determine the file type.
         $FileType = $Null
         switch ([System.IO.Path]::GetExtension($FilePath)) {
