@@ -67,7 +67,7 @@ function Invoke-NUnitForAssembly {
       Invoke-DotCoverForExecutable `
         -TargetExecutable $NunitExecutable `
         -TargetArguments $NunitArguments `
-        -OutputFile "$AssemblyPath.coverage.snap" `
+        -OutputFile "$AssemblyPath.$TestResultFilenamePattern.coverage.snap" `
         -DotCoverVersion $DotCoverVersion `
         -DotCoverFilters $DotCoverFilters
 
