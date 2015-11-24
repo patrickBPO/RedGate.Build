@@ -11,16 +11,16 @@
     A NuGet version string based on the input parameters. The string is also suitable for use as an assembly's AssemblyInformationalVersion attribute value.
 
     .EXAMPLE
-    Get-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'master' -IsDefaultBranch $True
+    New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'master' -IsDefaultBranch $True
 
     Returns '1.2.3.4'. This shows how this cmdlet might be invoked on the default master branch with a four digit version number.
 
     .EXAMPLE
-    Get-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'SomeBranch' -IsDefaultBranch $False
+    New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'SomeBranch' -IsDefaultBranch $False
 
     Returns '1.2.3-SomeBranch4'. This shows how this cmdlet might be invoked on a feature branch, resulting in a pre-release version string.
 #>
-function Get-NuGetPackageVersion 
+function New-NuGetPackageVersion 
 {
     [CmdletBinding()]
     param(
