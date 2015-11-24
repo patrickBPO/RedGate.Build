@@ -1,6 +1,6 @@
 ﻿#requires -Version 2 -Modules Pester
 
-Describe 'Get-NuGetPackageId' {
+Describe 'Get-NuGetPackageVersion' {
     Context 'When IsDefaultBranch is true' {
         It 'should return the Version' {
             Get-NuGetPackageId -Version '1.2.3.4' -IsDefaultBranch $True -BranchName 'master' | Should Be '1.2.3.4'

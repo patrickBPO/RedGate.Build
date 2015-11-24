@@ -1,5 +1,5 @@
 #requires -Version 2
-function Get-NuGetPackageId 
+function Get-NuGetPackageVersion 
 {
     [CmdletBinding()]
     param(
