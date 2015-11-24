@@ -6,17 +6,21 @@ function Get-NuGetPackageId
         [Parameter(Mandatory = $true)]
         [version] $Version,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [string] $BranchName,
 
-        [Parameter(Mandatory = $false)]
-        [switch] $IsDefaultBranch
+        [Parameter(Mandatory = $true)]
+        [bool] $IsDefaultBranch
     )
 
     # If this is the default branch, there's no pre-release suffix. Just return the version number.
-    if ($IsDefaultBranch.IsPresent)
+    if ($IsDefaultBranch)
     {
         return [string]$Version
+    }
+    elseif (-not $BranchName)
+    {
+        throw 'BranchName must be specified when IsDefaultBranch is false'
     }
 
     # Otherwise establish the pre-release suffix from the branch name.
