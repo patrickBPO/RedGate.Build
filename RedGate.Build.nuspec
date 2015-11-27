@@ -13,11 +13,11 @@
     <dependencies />
   </metadata>
   <files>
-    <file src="Private\*.ps1" target="tools\Private" />
-    <file src="Private\*.psm1" target="tools\Private" />
+    <file src="Private\**\*.ps1" target="tools\Private" />
+    <file src="Private\**\*.psm1" target="tools\Private" />
     <file src="Private\nuget.exe" target="tools\Private" />
-    <file src="Public\*.ps1" target="tools\Public" />
+    <file src="Public\**\*.ps1" target="tools\Public" />
     <file src="LICENSE.md" target="tools" />
-    <file src="*.psm1" target="tools" />
+    <file src="RedGate.Build.psm1" target="tools" />
   </files>
 </package>
