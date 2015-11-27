@@ -23,6 +23,8 @@ function Update-NuspecDependenciesVersions {
     begin {
         # Load the nuget packages
         $nugetPackages = Get-NugetPackagesFromConfigFiles -PackagesConfigPaths $PackagesConfigPaths
+        # Remove any .Obfuscated suffix we may have on some packages to catch version clashes between unobfuscated and obfuscated versions.
+        $nugetPackages | ForEach { $_.id = $_.id -replace '.obfuscated', '' }
 
         Test-NugetPackagesVersionsAreConsistent -NugetPackages $nugetPackages
 
@@ -49,16 +51,39 @@ function Update-NuspecDependenciesVersions {
         $NuspecFilePath = Resolve-Path $NuspecFilePath
 
         $nuspec = [xml] (Get-Content $NuspecFilePath)
-        $nuspec.package.metadata.dependencies.group.dependency | ForEach {
-            # Update the version of the dependency with the one from $nugetPackages
-            $_.version = $nugetPackages |
-                where Id -eq $_.id |
-                select -ExpandProperty Version |
-                Get-DependencyVersionRange
-            Write-Verbose "Set dependency of $($_.id) to $($_.version)"
-        }
+        # Update dependencies in groups
+        $nuspec.package.metadata.dependencies.group.dependency | Update-Dependency -NugetPackages $nugetPackages
+        # Update dependencies outside of groups
+        $nuspec.package.metadata.dependencies.dependency | Update-Dependency -NugetPackages $nugetPackages
+
         $nuspec.Save($NuspecFilePath)
         Write-Verbose "Processed $NuspecFilePath"
+    }
+
+}
+
+function Update-Dependency() {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $False, Position = 0, ValueFromPipeLine = $True)]
+        $InputObject,
+        [Parameter(Mandatory = $True, Position = 1)]
+        $NugetPackages
+    )
+
+    process {
+        if($InputObject -eq $null) { return }
+
+        $baseId = $InputObject.id -replace '.obfuscated', ''
+
+        # Update the version of the dependency with the one from $nugetPackages
+        $version = $NugetPackages | where Id -eq $baseId | select -ExpandProperty Version
+        if($version) {
+            $InputObject.version = Get-DependencyVersionRange $version
+            Write-Verbose "Set dependency of $($InputObject.id) to $($InputObject.version)"
+        } else {
+            Write-Verbose "Keeping dependency of $($InputObject.id) to $($InputObject.version)"
+        }
     }
 
 }
