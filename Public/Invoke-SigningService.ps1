@@ -90,11 +90,12 @@ function Invoke-SigningService {
         $FileType = $Null
         switch ([System.IO.Path]::GetExtension($FilePath)) {
             '.exe' { $FileType = 'Exe' }
+            '.msi' { $FileType = 'Exe' }
             '.dll' { $FileType = 'Exe' }
             '.vsix' { $FileType = 'Vsix' }
             '.jar' { $FileType = 'Jar' }
             '.application' { $FileType = 'ClickOnce' }
-            default { throw "Unsupported file type: $AssemblyPath" }
+            default { throw "Unsupported file type: $FilePath" }
         }
 
         # Make the web request to the signing service.
