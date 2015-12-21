@@ -8,8 +8,10 @@
 function Install-Package {
   [CmdletBinding()]
   param(
+    # The name/id of the nuget package to install
     [Parameter(Mandatory=$true)]
     [string] $Name,
+    # The version of the nuget package to install
     [Parameter(Mandatory=$true)]
     [string] $Version
   )

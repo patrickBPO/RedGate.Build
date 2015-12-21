@@ -1,4 +1,3 @@
-#requires -Version 1
 <#
         .SYNOPSIS
         Creates a new empty temp directory.

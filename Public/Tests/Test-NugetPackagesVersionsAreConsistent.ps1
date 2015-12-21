@@ -24,6 +24,10 @@ function Test-NugetPackagesVersionsAreConsistent {
     [Parameter(ParameterSetName='FromConfigFiles', Mandatory = $True, Position = 0)]
     [string[]] $PackagesConfigPaths,
 
+    # A list of nuget packages.
+    # They should be pscustomobjects with 2 properties.
+    #   id:       the nuget package id
+    #   version:  the nuget package version
     [Parameter(ParameterSetName='FromPackageList', Mandatory = $True, Position = 0)]
     [pscustomobject[]] $NugetPackages
   )

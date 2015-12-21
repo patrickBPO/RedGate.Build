@@ -1,6 +1,8 @@
 <#
 .SYNOPSIS
   Install JetBrains.dotCover.CommandLineTools to RedGate.Build\packages
+.DESCRIPTION
+  Install the JetBrains.dotCover.CommandLineTools nuget package to RedGate.Build\packages
 #>
 function Install-DotCoverPackage {
   [CmdletBinding()]
