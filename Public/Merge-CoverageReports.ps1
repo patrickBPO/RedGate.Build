@@ -28,6 +28,8 @@ function Merge-CoverageReports {
     # Create an HTML report if running outside of Teamcity to help with debugging
     & $DotCoverPath report /Source="$MergedSnapshotPath.zip" /Output="$OutputDir\report.html" /reporttype=HTML
   } else {
+    # Let Teamcity know where the current dotcover.exe we are using is
+    TeamCity-ConfigureDotNetCoverage -key 'dotcover_home' -value ($DotCoverPath | Split-Path)
     # Let Teamcity know where the report is.
     TeamCity-ImportDotNetCoverageResult 'dotcover' "$MergedSnapshotPath.zip"
   }
