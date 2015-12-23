@@ -2,3 +2,5 @@
 *.exe
 Pester
 TestResults.xml
+packages/
+paket.lock

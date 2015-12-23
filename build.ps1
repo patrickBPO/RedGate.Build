@@ -99,7 +99,7 @@ try {
 
   # Package the RedGate.Build module.
   Write-Info 'Creating RedGate.Build NuGet package'
-  & $NuGetPath pack .\RedGate.Build.nuspec -NoPackageAnalysis -Version $Version
+  & $NuGetPath pack .\RedGate.Build.nuspec -NoPackageAnalysis -Version $Version -NoDefaultExcludes
   if($LASTEXITCODE -ne 0) {
     throw "Could not nuget pack RedGate.Build. nuget returned exit code $LASTEXITCODE"
   }
