@@ -17,8 +17,8 @@
     dir '*.ps1' | Test-ScriptForParsingErrors
     Will parse every powershell script in the current folder and throw exceptions if parsing errors are encountered.
 
-.LINK
-    To other relevant cmdlets or help
+.NOTES
+    Insipration coming from https://rkeithhill.wordpress.com/2007/10/30/powershell-quicktip-preparsing-scripts-to-check-for-syntax-errors/
 #>
 Function Test-ScriptForParsingErrors
 {
