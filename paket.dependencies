@@ -1,0 +1,3 @@
+source https://api.nuget.org/v3/index.json
+
+nuget Invoke-Build ~> 2.13.0
