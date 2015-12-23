@@ -70,6 +70,9 @@ function Invoke-SigningService {
         [Parameter(Mandatory = $False)]
         [string] $MoreInfoUrl = 'http://www.red-gate.com'
     )
+    begin {
+        Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference', 'ProgressPreference'
+    }
 
     process {
         # Simple error checking.

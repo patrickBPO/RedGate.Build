@@ -21,6 +21,8 @@ function Update-NuspecDependenciesVersions {
     )
 
     begin {
+        Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
+
         # Load the nuget packages
         $nugetPackages = Get-NugetPackagesFromConfigFiles -PackagesConfigPaths $PackagesConfigPaths
         # Remove any .Obfuscated suffix we may have on some packages to catch version clashes between unobfuscated and obfuscated versions.

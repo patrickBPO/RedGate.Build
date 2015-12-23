@@ -30,6 +30,8 @@ function Zip-Files {
     [string] $BasePath
   )
 
+  Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
+
   # Copy the files matching $Files to a temp folder so that
   # we can easily 7zip it and preserve directory paths.
   $tempFolder = New-TempDir

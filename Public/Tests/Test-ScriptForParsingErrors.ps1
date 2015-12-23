@@ -31,6 +31,7 @@ Function Test-ScriptForParsingErrors
     )
     Begin
     {
+        Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
         $local:ErrorActionPreference = 'Stop'
     }
     Process

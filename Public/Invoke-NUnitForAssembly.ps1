@@ -47,6 +47,8 @@ function Invoke-NUnitForAssembly {
     [switch] $DotNotImportResultsToTeamcity
   )
 
+  Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
+
   $AssemblyPath = Resolve-Path $AssemblyPath
 
   Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage)"

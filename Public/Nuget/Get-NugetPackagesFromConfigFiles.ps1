@@ -17,6 +17,8 @@ function Get-NugetPackagesFromConfigFiles {
         [string[]] $PackagesConfigPaths
     )
 
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
+
     $packagesConfigs = @(Resolve-Path $PackagesConfigPaths)
 
     $nugetPackages = $packagesConfigs | ForEach {
