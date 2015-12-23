@@ -4,7 +4,7 @@
 # indeed have its Powershell help well defined.
 Describe 'All exported functions help should be defined' {
 
-  Get-Command -Module RedGate.Build | where { $_.Name -notlike 'TeamCity-*'} | ForEach {
+  Get-Command -Module RedGate.Build | where { $_.Name -notlike '*TeamCity*'} | ForEach {
     $command = $_
     Context "Command $($command.Name)" {
 
