@@ -210,5 +210,5 @@ function TeamCity-WriteServiceMessage([string]$messageName, $messageAttributesHa
 		$messageAttributesString = ("'{0}'" -f (escape $messageAttributesHashOrSingleValue))
 	}
 
-	Write-Output "##teamcity[$messageName $messageAttributesString]"
+	Write-Host "##teamcity[$messageName $messageAttributesString]" -Fore Magenta
 }
