@@ -5,21 +5,18 @@ $ErrorActionPreference = 'Stop'
 
 $teamcityModule = Import-Module $PSScriptRoot\Private\teamcity.psm1 -DisableNameChecking -PassThru
 
-"$PSScriptRoot\Private\" |
-    Resolve-Path |
-    Get-ChildItem -Filter *.ps1 -Recurse |
+
+Get-ChildItem "$PSScriptRoot\Private\" -Filter *.ps1 -Recurse |
     ForEach {
       . $_.FullName
     }
 
-"$PSScriptRoot\Public\" |
-    Resolve-Path |
-    Get-ChildItem -Filter *.ps1 -Recurse |
+
+Get-ChildItem "$PSScriptRoot\Public\" -Filter *.ps1 -Recurse |
     ForEach {
       . $_.FullName
       Export-ModuleMember -Function $_.BaseName
     }
-
 
 
 if ($Host.Name -ne "Default Host") {
