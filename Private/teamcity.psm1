@@ -65,33 +65,47 @@ function TeamCity-ConfigureDotNetCoverage([string]$key, [string]$value) {
     TeamCity-WriteServiceMessage 'dotNetCoverage' @{ $key=$value }
 }
 
-function TeamCity-ImportDotNetCoverageResult([string]$tool, [string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
+function TeamCity-ImportDotNetCoverageResult([string]$tool, [Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
+	}
 }
 
 # See http://confluence.jetbrains.net/display/TCD5/FxCop_#FxCop_-UsingServiceMessages
-function TeamCity-ImportFxCopResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='FxCop'; path=$path }
+function TeamCity-ImportFxCopResult([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='FxCop'; path=$path }
+	}
 }
 
-function TeamCity-ImportDuplicatesResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
+function TeamCity-ImportDuplicatesResult([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
+	}
 }
 
-function TeamCity-ImportInspectionCodeResult([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
+function TeamCity-ImportInspectionCodeResult([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
+	}
 }
 
-function TeamCity-ImportNUnitReport([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='nunit'; path=$path }
+function TeamCity-ImportNUnitReport([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='nunit'; path=$path }
+	}
 }
 
-function TeamCity-ImportJSLintReport([string]$path) {
-	TeamCity-WriteServiceMessage 'importData' @{ type='jslint'; path=$path }
+function TeamCity-ImportJSLintReport([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'importData' @{ type='jslint'; path=$path }
+	}
 }
 
-function TeamCity-PublishArtifact([string]$path) {
-	TeamCity-WriteServiceMessage 'publishArtifacts' $path
+function TeamCity-PublishArtifact([Parameter(ValueFromPipeline)][string]$path) {
+	process {
+		TeamCity-WriteServiceMessage 'publishArtifacts' $path
+	}
 }
 
 function TeamCity-ReportBuildStart([string]$message) {
