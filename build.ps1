@@ -35,6 +35,7 @@ param(
 
 
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue' #important for Invoke-WebRequest to perform well when executed from Teamcity.
 
 
 function Write-Info($Message) {
@@ -91,7 +92,7 @@ try {
   if(-not (Test-Path $NuGetPath) -or (Get-Item $NuGetPath).VersionInfo.ProductVersion -ne $NuGetVersion) {
     $NuGetUrl = "https://dist.nuget.org/win-x86-commandline/v$NuGetVersion/nuget.exe"
     Write-Host "Downloading $nugetUrl to $NuGetPath"
-    (New-Object Net.WebClient).DownloadFile($NuGetUrl, $NuGetPath) # Significantly faster than Invoke-WebRequest.
+    Invoke-WebRequest $NuGetUrl -OutFile $NuGetPath
   } else {
     Write-Host "$NuGetPath is present and is the correct version ($NuGetVersion)"
   }
