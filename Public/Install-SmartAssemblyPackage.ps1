@@ -1,6 +1,8 @@
 <#
 .SYNOPSIS
   Install SmartAssembly to RedGate.Build\packages
+.DESCRIPTION
+  Install a nuget package containing SmartAssembly.com to RedGate.Build\packages
 #>
 function Install-SmartAssemblyPackage {
   [CmdletBinding()]

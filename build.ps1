@@ -28,7 +28,7 @@ param(
 
   [Parameter(Mandatory = $False)]
   [string] $NugetFeedToPublishTo,
-  
+
   [Parameter(Mandatory = $False)]
   [string] $NugetFeedApiKey
 )
@@ -54,7 +54,7 @@ try {
     # let TC know
     TeamCity-SetBuildNumber($Version)
   }
-  
+
   # Clean any previous build output.
   Write-Info 'Cleaning any prior build output'
   $NuGetPackagePath = ".\RedGate.Build.$Version.nupkg"
@@ -111,8 +111,8 @@ try {
 
   # Import the RedGate.Build module.
   Write-Info 'Importing the RedGate.Build module'
-  Import-Module .\RedGate.Build.psm1
-  
+  Import-Module .\RedGate.Build.psm1 -Force
+
   # Run Pester tests.
   Write-Info 'Running Pester tests'
   Invoke-Pester -Script .\Tests\ -OutputFile $PesterResultsPath -OutputFormat NUnitXml
@@ -134,7 +134,7 @@ try {
   } else {
     Write-Host 'Publish skipped'
   }
-  
+
   Write-Info 'Build completed'
 } finally {
   Pop-Location

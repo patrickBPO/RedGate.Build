@@ -1,6 +1,8 @@
 <#
 .SYNOPSIS
   Install NUnit.Runners to RedGate.Build\packages
+.DESCRIPTION
+  Install the NUnit.Runners nuget package to RedGate.Build\packages
 #>
 function Install-NUnitPackage {
   [CmdletBinding()]

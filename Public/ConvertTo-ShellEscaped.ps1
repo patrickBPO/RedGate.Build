@@ -1,9 +1,6 @@
 #requires -Version 2
 
 <#
-        Author: Chris Lambrou
-        Copyright 2015, Red Gate Software Limited
-
         .SYNOPSIS
         Shell-escapes one or more strings for use in a command-line when starting a process.
 
@@ -24,6 +21,10 @@
         ConvertTo-ShellEscaped @('-path', 'C:\Program Files\', '-db', 'Data Source=local;Application Name="My app"')
 
         -path "C:\Program Files\\" -db "Data Source=local;Application Name=\"My app\""
+
+        .NOTES
+        Author: Chris Lambrou
+        Copyright 2015, Red Gate Software Limited
 #>
 function ConvertTo-ShellEscaped
 {
@@ -47,12 +48,12 @@ function ConvertTo-ShellEscaped
         $Escaped = $QuotesWithPossibleLeadingBackslashes.Replace($_, {
                 param($Match) (New-Object string @('\', (2 * $Match.Value.Length - 1))) + '"'
         })
-    
+
         # If the string ends with one or more trailing backslashes, we need to double them up.
         $Escaped = $TrailingBackslashes.Replace($Escaped, {
                 param($Match) New-Object string @('\', (2 * $Match.Value.Length))
         })
-    
+
         # Finally, surround with quotes if necessary, because:
         # 1. The string is empty.
         # 2. Some escaping actually happened in the above replacement calls.
