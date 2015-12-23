@@ -23,7 +23,6 @@
 Function Test-ScriptForParsingErrors
 {
     [CmdletBinding()]
-    [OutputType([Nullable])]
     Param
     (
         # The Path to the powershell script that will be tested
@@ -37,7 +36,12 @@ Function Test-ScriptForParsingErrors
     Process
     {
         Write-Verbose "Parsing $Path to check for parsing error"
-        $ExecutionContext.InvokeCommand.NewScriptBlock((Get-Content -Path $Path | Out-String)) | Out-Null
-        Write-Verbose "Parsing $Path - All good!"
+        try {
+            $ExecutionContext.InvokeCommand.NewScriptBlock((Get-Content -Path $Path | Out-String)) | Out-Null
+            Write-Verbose "Parsing $Path - All good!"
+        } catch {
+            # Throw the base exception, that is the parsing error we are looking for.
+            throw $_.Exception.GetBaseException().ErrorRecord
+        }
     }
 }
