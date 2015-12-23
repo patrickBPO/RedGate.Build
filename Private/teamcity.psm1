@@ -9,41 +9,48 @@ if ($env:TEAMCITY_VERSION) {
 	$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(8192,$host.UI.RawUI.MaxWindowSize.Height)
 }
 
-function TeamCity-TestSuiteStarted([string]$name) {
-	TeamCity-WriteServiceMessage 'testSuiteStarted' @{ name=$name }
+function Write-TeamCityTestSuiteStarted([string]$name) {
+	Write-TeamCityServiceMessage 'testSuiteStarted' @{ name=$name }
 }
+Set-Alias Teamcity-TestSuiteStarted Write-TeamCityTestSuiteStarted
 
-function TeamCity-TestSuiteFinished([string]$name) {
-	TeamCity-WriteServiceMessage 'testSuiteFinished' @{ name=$name }
+function Write-TeamCityTestSuiteFinished([string]$name) {
+	Write-TeamCityServiceMessage 'testSuiteFinished' @{ name=$name }
 }
+Set-Alias TeamCity-TestSuiteFinished Write-TeamCityTestSuiteFinished
 
-function TeamCity-TestStarted([string]$name) {
-	TeamCity-WriteServiceMessage 'testStarted' @{ name=$name }
+function Write-TeamCityTestStarted([string]$name) {
+	Write-TeamCityServiceMessage 'testStarted' @{ name=$name }
 }
+Set-Alias TeamCity-TestStarted Write-TeamCityTestStarted
 
-function TeamCity-TestFinished([string]$name, [int]$duration) {
+function Write-TeamCityTestFinished([string]$name, [int]$duration) {
 	$messageAttributes = @{name=$name; duration=$duration}
 
 	if ($duration -gt 0) {
 		$messageAttributes.duration=$duration
 	}
 
-	TeamCity-WriteServiceMessage 'testFinished' $messageAttributes
+	Write-TeamCityServiceMessage 'testFinished' $messageAttributes
 }
+Set-Alias TeamCity-TestFinished Write-TeamCityTestFinished
 
-function TeamCity-TestIgnored([string]$name, [string]$message='') {
-	TeamCity-WriteServiceMessage 'testIgnored' @{ name=$name; message=$message }
+function Write-TeamCityTestIgnored([string]$name, [string]$message='') {
+	Write-TeamCityServiceMessage 'testIgnored' @{ name=$name; message=$message }
 }
+Set-Alias TeamCity-TestIgnored Write-TeamCityTestIgnored
 
-function TeamCity-TestOutput([string]$name, [string]$output) {
-	TeamCity-WriteServiceMessage 'testStdOut' @{ name=$name; out=$output }
+function Write-TeamCityTestOutput([string]$name, [string]$output) {
+	Write-TeamCityServiceMessage 'testStdOut' @{ name=$name; out=$output }
 }
+Set-Alias TeamCity-TestOutput Write-TeamCityTestOutput
 
-function TeamCity-TestError([string]$name, [string]$output) {
-	TeamCity-WriteServiceMessage 'testStdErr' @{ name=$name; out=$output }
+function Write-TeamCityTestError([string]$name, [string]$output) {
+	Write-TeamCityServiceMessage 'testStdErr' @{ name=$name; out=$output }
 }
+Set-Alias TeamCity-TestError Write-TeamCityTestError
 
-function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='', [string]$type='', [string]$expected='', [string]$actual='') {
+function Write-TeamCityTestFailed([string]$name, [string]$message, [string]$details='', [string]$type='', [string]$expected='', [string]$actual='') {
 	$messageAttributes = @{ name=$name; message=$message; details=$details }
 
 	if (![string]::IsNullOrEmpty($type)) {
@@ -57,82 +64,97 @@ function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='
 		$messageAttributes.actual=$actual
 	}
 
-	TeamCity-WriteServiceMessage 'testFailed' $messageAttributes
+	Write-TeamCityServiceMessage 'testFailed' $messageAttributes
 }
+Set-Alias TeamCity-TestFailed Write-TeamCityTestFailed
 
 # See http://confluence.jetbrains.net/display/TCD5/Manually+Configuring+Reporting+Coverage
-function TeamCity-ConfigureDotNetCoverage([string]$key, [string]$value) {
-    TeamCity-WriteServiceMessage 'dotNetCoverage' @{ $key=$value }
+function Write-TeamCityConfigureDotNetCoverage([string]$key, [string]$value) {
+    Write-TeamCityServiceMessage 'dotNetCoverage' @{ $key=$value }
 }
+Set-Alias TeamCity-ConfigureDotNetCoverage Write-TeamCityConfigureDotNetCoverage
 
-function TeamCity-ImportDotNetCoverageResult([string]$tool, [Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportDotNetCoverageResult([string]$tool, [Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='dotNetCoverage'; tool=$tool; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportDotNetCoverageResult Write-TeamCityImportDotNetCoverageResult
 
 # See http://confluence.jetbrains.net/display/TCD5/FxCop_#FxCop_-UsingServiceMessages
-function TeamCity-ImportFxCopResult([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportFxCopResult([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='FxCop'; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='FxCop'; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportFxCopResult Write-TeamCityImportFxCopResult
 
-function TeamCity-ImportDuplicatesResult([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportDuplicatesResult([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='DotNetDupFinder'; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportDuplicatesResult Write-TeamCityImportDuplicatesResult
 
-function TeamCity-ImportInspectionCodeResult([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportInspectionCodeResult([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='ReSharperInspectCode'; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportInspectionCodeResult Write-TeamCityImportInspectionCodeResult
 
-function TeamCity-ImportNUnitReport([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportNUnitReport([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='nunit'; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='nunit'; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportNUnitReport Write-TeamCityImportNUnitReport
 
-function TeamCity-ImportJSLintReport([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityImportJSLintReport([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'importData' @{ type='jslint'; path=$path }
+		Write-TeamCityServiceMessage 'importData' @{ type='jslint'; path=$path }
 	}
 }
+Set-Alias TeamCity-ImportJSLintReport Write-TeamCityImportJSLintReport
 
-function TeamCity-PublishArtifact([Parameter(ValueFromPipeline)][string]$path) {
+function Write-TeamCityPublishArtifact([Parameter(ValueFromPipeline)][string]$path) {
 	process {
-		TeamCity-WriteServiceMessage 'publishArtifacts' $path
+		Write-TeamCityServiceMessage 'publishArtifacts' $path
 	}
 }
+Set-Alias TeamCity-PublishArtifact Write-TeamCityPublishArtifact
 
-function TeamCity-ReportBuildStart([string]$message) {
-	TeamCity-WriteServiceMessage 'progressStart' $message
+function Write-TeamCityBuildStart([string]$message) {
+	Write-TeamCityServiceMessage 'progressStart' $message
 }
+Set-Alias TeamCity-ReportBuildStart Write-TeamCityBuildStart
 
-function TeamCity-ReportBuildProgress([string]$message) {
-	TeamCity-WriteServiceMessage 'progressMessage' $message
+function Write-TeamCityBuildProgress([string]$message) {
+	Write-TeamCityServiceMessage 'progressMessage' $message
 }
+Set-Alias TeamCity-ReportBuildProgress Write-TeamCityBuildProgress
 
-function TeamCity-ReportBuildFinish([string]$message) {
-	TeamCity-WriteServiceMessage 'progressFinish' $message
+function Write-TeamCityBuildFinish([string]$message) {
+	Write-TeamCityServiceMessage 'progressFinish' $message
 }
+Set-Alias TeamCity-ReportBuildFinish Write-TeamCityBuildFinish
 
-function TeamCity-ReportBuildStatus([string]$status, [string]$text='') {
-	TeamCity-WriteServiceMessage 'buildStatus' @{ status=$status; text=$text }
+function Write-TeamCityBuildStatus([string]$status, [string]$text='') {
+	Write-TeamCityServiceMessage 'buildStatus' @{ status=$status; text=$text }
 }
+Set-Alias TeamCity-ReportBuildStatus Write-TeamCityBuildStatus
 
-function TeamCity-SetBuildNumber([string]$buildNumber) {
-	TeamCity-WriteServiceMessage 'buildNumber' $buildNumber
+function Write-TeamCityBuildNumber([string]$buildNumber) {
+	Write-TeamCityServiceMessage 'buildNumber' $buildNumber
 }
+Set-Alias TeamCity-SetBuildNumber Write-TeamCityBuildNumber
 
-function TeamCity-SetBuildStatistic([string]$key, [string]$value) {
-	TeamCity-WriteServiceMessage 'buildStatisticValue' @{ key=$key; value=$value }
+function Write-TeamCityBuildStatistic([string]$key, [string]$value) {
+	Write-TeamCityServiceMessage 'buildStatisticValue' @{ key=$key; value=$value }
 }
+Set-Alias TeamCity-SetBuildStatistic Write-TeamCityBuildStatistic
 
-function TeamCity-CreateInfoDocument([string]$buildNumber='', [boolean]$status=$true, [string[]]$statusText=$null, [System.Collections.IDictionary]$statistics=$null) {
+function New-TeamCityInfoDocument([string]$buildNumber='', [boolean]$status=$true, [string[]]$statusText=$null, [System.Collections.IDictionary]$statistics=$null) {
 	$doc=New-Object xml;
 	$buildEl=$doc.CreateElement('build');
 
@@ -176,15 +198,17 @@ function TeamCity-CreateInfoDocument([string]$buildNumber='', [boolean]$status=$
 
 	return $doc;
 }
+Set-Alias TeamCity-CreateInfoDocument New-TeamCityInfoDocument
 
-function TeamCity-WriteInfoDocument([xml]$doc) {
+function Save-TeamCityInfoDocument([xml]$doc) {
 	$dir=(Split-Path $buildFile)
 	$path=(Join-Path $dir 'teamcity-info.xml')
 
 	$doc.Save($path);
 }
+Set-Alias TeamCity-WriteInfoDocument Save-TeamCityInfoDocument
 
-function TeamCity-WriteServiceMessage([string]$messageName, $messageAttributesHashOrSingleValue) {
+function Write-TeamCityServiceMessage([string]$messageName, $messageAttributesHashOrSingleValue) {
 	function escape([string]$value) {
 		([char[]] $value |
 				%{ switch ($_)
@@ -212,3 +236,4 @@ function TeamCity-WriteServiceMessage([string]$messageName, $messageAttributesHa
 
 	Write-Host "##teamcity[$messageName $messageAttributesString]" -Fore Magenta
 }
+Set-Alias TeamCity-WriteServiceMessage Write-TeamCityServiceMessage
