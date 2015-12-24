@@ -39,9 +39,6 @@ Function Invoke-Build
         }
         $BuildFile = Resolve-Path $BuildFile -ErrorAction Stop
 
-        if(!(Test-Path $PackagesDir\Invoke-Build\tools\Invoke-Build.ps1)){
-            Install-PaketPackages
-        }        
         # Load the list of tasks from the build File
         $taskList = @(& $PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 ? $BuildFile | select -ExpandProperty Name | Sort)
 
