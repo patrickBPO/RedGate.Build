@@ -14,6 +14,7 @@
 
 .PARAMETER NugetFeedToPublishTo
   A url to a NuGet feed the package will be published to.
+  This can also be a path to a local folder where the package will be copied to
 
 .PARAMETER NugetFeedApiKey
   The Api Key that allows pushing to the feed passed in as -NugetFeedToPublishTo.
@@ -24,10 +25,10 @@ param(
   [string] $Version = '0.0.1-dev',
 
   [Parameter(Mandatory = $False)]
-  [bool] $IsDefaultBranch = $False,
+  [bool] $IsDefaultBranch = $True,
 
   [Parameter(Mandatory = $False)]
-  [string] $NugetFeedToPublishTo,
+  [string] $NugetFeedToPublishTo = $env:LocalDevNugetPackageFolder,
 
   [Parameter(Mandatory = $False)]
   [string] $NugetFeedApiKey
@@ -128,10 +129,14 @@ try {
 
   # Publish the NuGet package.
   Write-Info 'Publishing RedGate.Build NuGet package'
-  if($IsDefaultBranch -and $NugetFeedToPublishTo -and $NugetFeedApiKey) {
-    Write-Host 'Running NuGet publish'
+  if($IsDefaultBranch -and $NugetFeedToPublishTo) {
+    Write-Host "Running NuGet publish to $NugetFeedToPublishTo"
     # Let's only push the packages from master when nuget feed info is passed in...
-    & $NuGetPath push $NuGetPackagePath -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
+    if($NugetFeedApiKey) {
+        & $NuGetPath push $NuGetPackagePath -Source $NugetFeedToPublishTo -ApiKey $NugetFeedApiKey
+    } else {
+        & $NuGetPath push $NuGetPackagePath -Source $NugetFeedToPublishTo
+    }
   } else {
     Write-Host 'Publish skipped'
   }
