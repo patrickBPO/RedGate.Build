@@ -2,7 +2,7 @@ function Get-SmartAssemblyComPath {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing the Smart Assembly executables
-    [string] $SmartAssemblyVersion = $DefaultSmartAssemblyVersion
+    [string] $SmartAssemblyVersion = $_DefaultSmartAssemblyVersion
   )
 
   Write-Verbose "Using Smart Assembly version $SmartAssemblyVersion"

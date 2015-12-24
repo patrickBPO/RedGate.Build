@@ -8,7 +8,7 @@ function Install-DotCoverPackage {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
-    [string] $Version = $DefaultDotCoverVersion
+    [string] $Version = $_DefaultDotCoverVersion
   )
 
   Install-Package JetBrains.dotCover.CommandLineTools $Version

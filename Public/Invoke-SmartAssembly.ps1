@@ -16,7 +16,7 @@ function Invoke-SmartAssembly {
     [Parameter(Mandatory=$true)]
     [string] $ProjectPath,
     # The version of the nuget package containing the Smart Assembly executables
-    [string] $SmartAssemblyVersion = $DefaultSmartAssemblyVersion,
+    [string] $SmartAssemblyVersion = $_DefaultSmartAssemblyVersion,
     # Specify the input assembly filename
     [string] $InputFilename,
     # Specify the output assembly filename

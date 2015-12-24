@@ -16,14 +16,14 @@ function Install-Package {
     [string] $Version
   )
 
-  if( -not(Test-Path "$PackagesDir\$Name.$Version")) {
+  if( -not(Test-Path "$_PackagesDir\$Name.$Version")) {
     # Install the package (only if not already there). Print any nuget.exe output to the verbose stream
-    Write-Verbose "Installing $Name.$Version to $PackagesDir" -verbose
+    Write-Verbose "Installing $Name.$Version to $_PackagesDir" -verbose
     Execute-Command -ScriptBlock {
-      & $NugetExe install $Name -Version $Version -OutputDirectory $PackagesDir -PackageSaveMode nuspec | Write-Verbose
+      & $NugetExe install $Name -Version $Version -OutputDirectory $_PackagesDir -PackageSaveMode nuspec | Write-Verbose
     }
   }
 
   # Return the folder where the package was installed
-  "$PackagesDir\$Name.$Version" | Resolve-Path
+  "$_PackagesDir\$Name.$Version" | Resolve-Path
 }

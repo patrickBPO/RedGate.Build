@@ -11,7 +11,7 @@ function Get-BuildFile {
     param(
         # The folder to start looking in for .build.ps1 or build.ps1 files.
         [Parameter(ValueFromPipeline)]
-        [string] $CurrentFolder = $ModuleDir
+        [string] $CurrentFolder = $_ModuleDir
     )
     begin {
         Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'

@@ -2,16 +2,16 @@ function Get-Paket {
     [CmdletBinding()]
     param()
 
-    if($PaketExe) {
-        return $PaketExe
+    if($_PaketExe) {
+        return $_PaketExe
     }
 
     & "$PSScriptRoot\.paket\paket.bootstrapper.exe" | Write-Verbose
 
-    # Store the path to paket.exe.
-    $script:PaketExe = Resolve-Path "$PSScriptRoot\.paket\paket.exe"
+    # Store the path to paket.exe in a variable available in the scope of this module.
+    $script:_PaketExe = Resolve-Path "$PSScriptRoot\.paket\paket.exe"
 
-    return $PaketExe
+    return $_PaketExe
 }
 
 function Install-PaketPackages {
@@ -19,19 +19,12 @@ function Install-PaketPackages {
     param()
 
     begin {
-        Push-Location $ModuleDir
+        Push-Location $_ModuleDir
     }
-
     process {
-        $PaketExe = Get-Paket
-
-        Execute-Command {
-            & $PaketExe install
-        } | Write-Verbose
+        & (Get-Paket) install | Write-Verbose
     }
-
     end {
         Pop-Location
     }
-
 }

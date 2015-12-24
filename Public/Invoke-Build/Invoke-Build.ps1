@@ -40,7 +40,7 @@ Function Invoke-Build
         $BuildFile = Resolve-Path $BuildFile -ErrorAction Stop
 
         # Load the list of tasks from the build File
-        $taskList = @(& $PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 ? $BuildFile | select -ExpandProperty Name | Sort)
+        $taskList = @(& $_PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 ? $BuildFile | select -ExpandProperty Name | Sort)
 
         $private:parameters = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 
@@ -104,6 +104,6 @@ the first added task is invoked.
         Test-ScriptForParsingErrors -Path $PSBoundParameters['File']
 
         # help about_Splatting to get more info on @PSBoundParameters
-        & $PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 @PSBoundParameters
+        & $_PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 @PSBoundParameters
     }
 }

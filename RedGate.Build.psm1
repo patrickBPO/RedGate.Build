@@ -21,7 +21,7 @@ Get-ChildItem "$PSScriptRoot\Public\" -Filter *.ps1 -Recurse |
 Install-PaketPackages
 
 # Store the path to nuget.exe.
-$NugetExe = Resolve-Path "$PackagesDir\Nuget.CommandLine\tools\nuget.exe"
+$NugetExe = Resolve-Path "$_PackagesDir\Nuget.CommandLine\tools\nuget.exe"
 
 if ($Host.Name -ne "Default Host") {
   Write-Host "RedGate.Build is using its own nuget.exe. Version $((Get-Item $nugetExe).VersionInfo.FileVersion)"

@@ -1,10 +1,10 @@
 # _Init.ps1 is a script that can be used to initialise stuff when RedGate.Build is imported for the first time.
 # (Like variables available within the module only.)
 
-$ModuleDir = Resolve-Path "$PSScriptRoot\.."
+$_ModuleDir = Resolve-Path "$PSScriptRoot\.."
 # Create the packages folder where nuget packages used by this module will be installed.
-$PackagesDir = New-Item -Path "$ModuleDir\packages" -ItemType Directory -Force
+$_PackagesDir = New-Item -Path "$_ModuleDir\packages" -ItemType Directory -Force
 
-$DefaultNUnitVersion = '2.6.4'
-$DefaultDotCoverVersion = '3.2.0'
-$DefaultSmartAssemblyVersion = '6.8.0.248'
+$_DefaultNUnitVersion = '2.6.4'
+$_DefaultDotCoverVersion = '3.2.0'
+$_DefaultSmartAssemblyVersion = '6.8.0.248'

@@ -8,7 +8,7 @@ function Install-NUnitPackage {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
-    [string] $Version = $DefaultNUnitVersion
+    [string] $Version = $_DefaultNUnitVersion
   )
 
   Install-Package NUnit.Runners $Version

@@ -22,7 +22,7 @@ function Invoke-NUnitForAssembly {
     [Parameter(Mandatory=$true)]
     [string] $AssemblyPath,
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
-    [string] $NUnitVersion = $DefaultNUnitVersion,
+    [string] $NUnitVersion = $_DefaultNUnitVersion,
     # Whether to use nunit x86 or nunit x64 (default)
     [switch] $x86,
     # If specified, Framework version to be used for tests. (pass /framework=XX to nunit-console)
@@ -39,7 +39,7 @@ function Invoke-NUnitForAssembly {
     # If set, enable code coverage using dotcover
     [bool] $EnableCodeCoverage = $false,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
-    [string] $DotCoverVersion = $DefaultDotCoverVersion,
+    [string] $DotCoverVersion = $_DefaultDotCoverVersion,
     # The dotcover filters passed to dotcover.exe
     [string] $DotCoverFilters = '',
     # If set, do not import test results automatically to Teamcity.

@@ -2,7 +2,7 @@ function Get-DotCoverExePath {
   [CmdletBinding()]
   param(
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
-    [string] $DotCoverVersion = $DefaultDotCoverVersion
+    [string] $DotCoverVersion = $_DefaultDotCoverVersion
   )
 
   Write-Verbose "Using DotCover version $DotCoverVersion"

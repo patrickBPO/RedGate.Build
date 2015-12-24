@@ -33,7 +33,7 @@ function Invoke-DotCoverForExecutable {
     [string] $OutputFile,
 
     [Parameter(Mandatory = $False)]
-    [string] $DotCoverVersion = $DefaultDotCoverVersion,
+    [string] $DotCoverVersion = $_DefaultDotCoverVersion,
 
     [Parameter(Mandatory = $False)]
     [string] $DotCoverFilters = ''
