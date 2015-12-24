@@ -1,3 +1,4 @@
 source https://api.nuget.org/v3/index.json
 
 nuget Invoke-Build ~> 2.13.0
+nuget Nuget.CommandLine ~> 3.3.0

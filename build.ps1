@@ -89,7 +89,7 @@ try {
   # Download NuGet if necessary.
   Write-Info 'Checking NuGet is up to date'
   $NuGetVersion = '3.2.0'
-  $NuGetPath = '.\Private\nuget.exe'
+  $NuGetPath = '.\nuget.exe'
   if(-not (Test-Path $NuGetPath) -or (Get-Item $NuGetPath).VersionInfo.ProductVersion -ne $NuGetVersion) {
     $NuGetUrl = "https://dist.nuget.org/win-x86-commandline/v$NuGetVersion/nuget.exe"
     Write-Host "Downloading $nugetUrl to $NuGetPath"
