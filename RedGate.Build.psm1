@@ -33,5 +33,7 @@ Get-Command -Module $teamcityModule -CommandType Function | Export-ModuleMember
 # Always export all aliases.
 Export-ModuleMember -Alias *
 
+Export-ModuleMember -Variable NugetExe
+
 # For debug purposes, uncomment this to export all functions of this module.
 # Export-ModuleMember -Function *
