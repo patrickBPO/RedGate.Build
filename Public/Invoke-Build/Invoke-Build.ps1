@@ -76,9 +76,6 @@ Function Invoke-Build
         $parameters
     }
 
-    begin {
-
-    }
     process {
         # Quick check that our build script syntax is all right.
         Test-ScriptForParsingErrors -Path $PSBoundParameters['File']
