@@ -18,13 +18,13 @@ Get-ChildItem "$PSScriptRoot\Public\" -Filter *.ps1 -Recurse |
       Export-ModuleMember -Function $_.BaseName
     }
 
-Write-Verbose 'RedGate.Build is installing its nuget depedencies using paket...' -verbose
+Write-Verbose 'RedGate.Build is installing its dependencies using paket...' -verbose
 Install-PaketPackages
 
 # Store the path to nuget.exe.
 $NugetExe = Resolve-Path "$_PackagesDir\Nuget.CommandLine\tools\nuget.exe"
 
-Write-Verbose "RedGate.Build is using its own nuget.exe. Version $((Get-Item $nugetExe).VersionInfo.FileVersion)" -verbose
+Write-Verbose "RedGate.Build is using its own nuget.exe. Version $((Get-Item $NugetExe).VersionInfo.FileVersion)" -verbose
 
 # Export all the functions from the Teamcity module
 Get-Command -Module $teamcityModule -CommandType Function | Export-ModuleMember

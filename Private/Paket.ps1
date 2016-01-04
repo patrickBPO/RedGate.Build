@@ -6,7 +6,7 @@ function Get-Paket {
         return $_PaketExe
     }
 
-    & "$PSScriptRoot\.paket\paket.bootstrapper.exe" | Write-Verbose
+    & "$PSScriptRoot\.paket\paket.bootstrapper.exe" --prefer-nuget | Write-Verbose
 
     # Store the path to paket.exe in a variable available in the scope of this module.
     $script:_PaketExe = Resolve-Path "$PSScriptRoot\.paket\paket.exe"
