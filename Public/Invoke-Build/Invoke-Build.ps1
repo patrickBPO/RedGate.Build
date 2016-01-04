@@ -19,6 +19,9 @@
         Any parameter defined in the build script file can be used. Use tab-autocomplete to discover them.
             build -[Tab][Tab]
 
+        For details on what parameters a build script defines, use
+            help <path-to-build-script-file>
+
 .EXAMPLE
     build
     Use Invoke-Build to execute the first build script found by Get-BuildFile.
