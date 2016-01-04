@@ -58,54 +58,11 @@ Function Invoke-Build
 
         $private:parameters = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 
-        function Add-Parameter([Parameter(ValueFromPipeline)]$parameter, $ParameterDictionary) {
-            process {
-                $ParameterDictionary.Add($parameter.Name, $parameter)
-            }
-        }
+        # Add the -Task parameter. -ValidateSet means we'll get tab-completion based on the list of Task defined in the build script.
+        New-DynamicParameter -Name 'Task' -Type '[string[]]' -ValidateSet $TaskList -HelpMessage 'One or more tasks to be invoked' -Dictionary $parameters
 
-        function New-TaskParameter($TaskList) {
-            # Generate the -Task parameter and create a set of valid tasks that can be passed in
-            $private:taskParamAttributes = New-Object -Type System.Collections.ObjectModel.Collection[Attribute]
-            $private:taskParamAttribute = New-Object -Type System.Management.Automation.ParameterAttribute
-            $taskParamAttribute.Mandatory = $False
-            $taskParamAttribute.HelpMessage = @"
-One or more tasks to be invoked. If it is not specified, null, empty,
-or equal to '.' then the task '.' is invoked if it exists, otherwise
-the first added task is invoked.
-"@
-            # Create ValidationSetAttribute to make tab-complete work
-            # Pass $TaskList which is the list of Invoke-Build Tasks defined in the $BuildFile script.
-            $private:taskParamValidationSetAttribute = New-Object -Type System.Management.Automation.ValidateSetAttribute($TaskList)
-
-            # Add attributes to the container
-            $taskParamAttributes.Add($taskParamAttribute)
-            $taskParamAttributes.Add($taskParamValidationSetAttribute)
-
-            #Create the actual parameter and return it
-            New-Object -Type System.Management.Automation.RuntimeDefinedParameter('Task', [String[]], $taskParamAttributes)
-        }
-
-        function Get-BuildScriptParameters() {
-            $private:reservedparams = 'Task', 'File', 'Parameters', 'Checkpoint', 'Result', 'Safe', 'Summary', 'Resume', 'WhatIf',
-            'Verbose', 'Debug', 'ErrorAction', 'WarningAction', 'ErrorVariable', 'WarningVariable', 'OutVariable', 'OutBuffer',
-            'PipelineVariable', 'InformationAction', 'InformationVariable'
-
-            $buildScriptCommand = Get-Command -Name $BuildFile -CommandType ExternalScript
-            if($buildScriptCommand.Parameters.Count -eq 0) {return}
-
-            ($private:attributes = New-Object System.Collections.ObjectModel.Collection[Attribute]).Add((New-Object System.Management.Automation.ParameterAttribute))
-            foreach($key in $buildScriptCommand.Parameters.Keys) {
-                $p = $buildScriptCommand.Parameters[$key]
-                if ($reservedparams -notcontains $p.Name) {
-                    # Create and return a new Parameter
-                    New-Object System.Management.Automation.RuntimeDefinedParameter $p.Name, $p.ParameterType, $attributes
-                }
-            }
-        }
-
-        New-TaskParameter -TaskList $taskList | Add-Parameter -ParameterDictionary $parameters
-        Get-BuildScriptParameters | Add-Parameter -ParameterDictionary $parameters
+        # Add each parameter from the build script.
+        Get-ScriptParameters -File $BuildFile | ForEach { New-DynamicParameter -Dictionary $parameters -Name $_.Name -Type $_.ParameterType }
 
         # return the collection of dynamic parameters
         $parameters
