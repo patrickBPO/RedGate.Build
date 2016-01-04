@@ -28,3 +28,18 @@ function Install-PaketPackages {
         Pop-Location
     }
 }
+
+function Show-PaketPackages {
+    [CmdletBinding()]
+    param()
+
+    begin {
+        Push-Location $_ModuleDir
+    }
+    process {
+        & (Get-Paket) show-installed-packages -s
+    }
+    end {
+        Pop-Location
+    }
+}
