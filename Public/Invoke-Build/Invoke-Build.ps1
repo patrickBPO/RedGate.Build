@@ -59,7 +59,7 @@ Function Invoke-Build
         $private:parameters = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 
         # Add the -Task parameter. -ValidateSet means we'll get tab-completion based on the list of Task defined in the build script.
-        New-DynamicParameter -Name 'Task' -Type '[string[]]' -ValidateSet $TaskList -HelpMessage 'One or more tasks to be invoked' -Dictionary $parameters
+        New-DynamicParameter -Name 'Task' -Type ([string[]]) -ValidateSet $TaskList -HelpMessage 'One or more tasks to be invoked' -Dictionary $parameters
 
         # Add each parameter from the build script.
         Get-ScriptParameters -File $BuildFile | ForEach { New-DynamicParameter -Dictionary $parameters -Name $_.Name -Type $_.ParameterType }
