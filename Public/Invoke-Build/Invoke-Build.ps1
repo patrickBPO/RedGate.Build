@@ -4,17 +4,31 @@
 
 .DESCRIPTION
     Execute a Invoke-Build build script.
-    This wrapper around Invoke-Build should help us with auto completion
-    of tasks / build files and so on.
+    This wrapper around Invoke-Build should help us with auto completion of tasks / parameters
 
-.OUTPUTS
-    The value returned by this cmdlet
+    The build script file to execute can be set either by:
+        * using the -File parameter.
+        * setting the $env:BuildFile variable.
+        * letting Get-BuildFile find the first [.]build.ps1 file in parent folders of the RedGate.Build module
 
 .EXAMPLE
-    Example of how to use this cmdlet
+    build
+    Use Invoke-Build to execute the first build script found by Get-BuildFile.
+
+.EXAMPLE
+    $env:BuildFile = 'C:\mybuildscript.ps1'; build -Configuration Release
+    Use Invoke-Build to execute 'C:\mybuildscript.ps1'
+    'C:\mybuildscript.ps1' is expected to define a $Configuration parameter that can accept 'Release' as a valid value.
+
+.EXAMPLE
+    build -File 'C:\mybuildscript.ps1' -Task 'clean'
+    Use Invoke-Build to invoke the 'clean' task from the 'C:\mybuildscript.ps1' build script.
 
 .LINK
     https://github.com/nightroman/Invoke-Build
+
+.LINK
+    Get-BuildFile
 #>
 Function Invoke-Build
 {
@@ -39,7 +53,7 @@ Function Invoke-Build
         }
         $BuildFile = Resolve-Path $BuildFile -ErrorAction Stop
 
-        # Load the list of tasks from the build File
+        # Load the list of tasks from the build File. We will use it to validate the -Task parameter
         $taskList = @(& $_PackagesDir\Invoke-Build\tools\Invoke-Build.ps1 ? $BuildFile | select -ExpandProperty Name | Sort)
 
         $private:parameters = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
@@ -61,6 +75,7 @@ or equal to '.' then the task '.' is invoked if it exists, otherwise
 the first added task is invoked.
 "@
             # Create ValidationSetAttribute to make tab-complete work
+            # Pass $TaskList which is the list of Invoke-Build Tasks defined in the $BuildFile script.
             $private:taskParamValidationSetAttribute = New-Object -Type System.Management.Automation.ValidateSetAttribute($TaskList)
 
             # Add attributes to the container
