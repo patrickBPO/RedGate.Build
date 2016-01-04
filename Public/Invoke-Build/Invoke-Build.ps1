@@ -11,6 +11,14 @@
         * setting the $env:BuildFile variable.
         * letting Get-BuildFile find the first [.]build.ps1 file in parent folders of the RedGate.Build module
 
+    Additional dynamic parameters (they depend on the build script file being used):
+        -Task <String[]>
+        The Task(s) to execute as defined in the build script file. Use tab-autocomplete to discover available tasks
+            build -Task [Tab][Tab]
+
+        Any parameter defined in the build script file can be used. Use tab-autocomplete to discover them.
+            build -[Tab][Tab]
+
 .EXAMPLE
     build
     Use Invoke-Build to execute the first build script found by Get-BuildFile.
