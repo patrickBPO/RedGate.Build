@@ -6,7 +6,11 @@ if ($env:TEAMCITY_VERSION) {
 	# on service messages, as TeamCity quite naturally fails parsing a wrapped
 	# message. The solution is to set a new, much wider output width. It will
 	# only be set if TEAMCITY_VERSION exists, i.e., if started by TeamCity.
-	$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(8192,$host.UI.RawUI.MaxWindowSize.Height)
+	try {
+		$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(8192,$host.UI.RawUI.MaxWindowSize.Height)
+	} catch {
+		Write-Warning "Could not set `$host.UI.RawUI.BufferSize. $_"
+	}
 }
 
 function Write-TeamCityTestSuiteStarted([string]$name) {
