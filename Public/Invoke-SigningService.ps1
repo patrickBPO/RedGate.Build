@@ -19,23 +19,6 @@ function Add-ToHashTableIfNotNull {
     .DESCRIPTION
     Signs a .NET assembly, jar file, VSIX installer or ClickOnce application using the Redgate signing service.
 
-    .PARAMETER FilePath
-    The path of the file to be signed. The file will me updated in place with a corresponding signed version.
-    The path may reference a .NET assembly (.exe or .dll), a java Jar file, a Visual Studio Installer (.vsix) or a .NET ClickOnce application (.application).
-    This parameter has several aliases (JarPath, VsixPath, ClickOnceApplicationPath and AssemblyPath) to help improve readability of your scripts.
-
-    .PARAMETER SigningServiceUrl
-    The url of the signing service. If unspecified, defaults to the $env:SigningServiceUrl environment variable.
-
-    .PARAMETER Certificate
-    Indicates which signing certificate to use. Defaults to 'master'.
-
-    .PARAMETER Description
-    An optional description. Defaults to 'Red Gate Software Ltd.'.
-
-    .PARAMETER MoreInfoUrl
-    An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
-
     .OUTPUTS
     The FilePath parameter, to enable call chaining.
 
@@ -47,26 +30,43 @@ function Add-ToHashTableIfNotNull {
 
     .EXAMPLE
     $VsixPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.Installer.vsix"
-    Invoke-SigningService -VsixPath $AssemblyPath
+    Invoke-SigningService -VsixPath $AssemblyPath -HashAlgorithm SHA1
 
     This shows how to sign a Visual Studio Installer file. The signing service URL is taken from the $env:SigningServiceUrl environment variable that is present on all of the build agents.
 #>
 function Invoke-SigningService {
     [CmdletBinding()]
     param(
+        # The path of the file to be signed. The file will me updated in place with a corresponding signed version.
+        # The path may reference a .NET assembly (.exe or .dll), a java Jar file, a Visual Studio Installer (.vsix) or a .NET ClickOnce application (.application).
+        # This parameter has several aliases (JarPath, VsixPath, ClickOnceApplicationPath and AssemblyPath) to help improve readability of your scripts.
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [Alias('JarPath', 'VsixPath', 'ClickOnceApplicationPath', 'AssemblyPath')]
         [string] $FilePath,
 
+        # The url of the signing service. If unspecified, defaults to the $env:SigningServiceUrl environment variable.
         [Parameter(Mandatory = $False)]
         [string] $SigningServiceUrl = $env:SigningServiceUrl,
 
+        # Indicates which signing certificate to use. Defaults to 'master'.
         [Parameter(Mandatory = $False)]
         [string] $Certificate = 'Master',
 
+        # Only used when signing vsix files. Valid values are sha1, sha256.
+        # For vsix targeting Visual Studio up to 2013, it should be sha1
+        # For vsix targeting Visual Studio 2015+, it should be sha256
+        # Note that it does not seem to be recommended to target VS 2013 and 2015 with the same vsix file
+        # Altough using sha1 in that case still seem to allow for the package to be installed in VS2015
+        # Default value: sha1
+        [Parameter(Mandatory = $False)]
+        [ValidateSet('sha1', 'sha256')]
+        [string] $HashAlgorithm = 'sha1',
+
+        # An optional description. Defaults to 'Red Gate Software Ltd.'.
         [Parameter(Mandatory = $False)]
         [string] $Description = 'Red Gate Software Ltd.',
 
+        # An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
         [Parameter(Mandatory = $False)]
         [string] $MoreInfoUrl = 'http://www.red-gate.com'
     )
@@ -107,6 +107,9 @@ function Invoke-SigningService {
         Add-ToHashTableIfNotNull $Headers -Key 'Certificate' -Value $Certificate
         Add-ToHashTableIfNotNull $Headers -Key 'Description' -Value $Description
         Add-ToHashTableIfNotNull $Headers -Key 'MoreInfoUrl' -Value $MoreInfoUrl
+        if( $FileType -eq 'Vsix') {
+            Add-ToHashTableIfNotNull $Headers -Key 'HashAlgorithm' -Value $HashAlgorithm
+        }
 
         Write-Verbose "Signing $FilePath using $SigningServiceUrl"
         $Headers.Keys | ForEach { Write-Verbose "`t $_`: $($Headers[$_])" }
