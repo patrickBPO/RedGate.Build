@@ -1,17 +1,3 @@
-function Add-ToHashTableIfNotNull {
-    param(
-        [Parameter(Mandatory=$true)]
-        [HashTable] $HashTable,
-        [Parameter(Mandatory=$true)]
-        [string] $Key,
-        [string] $Value
-    )
-
-    if( $Value ) {
-        $HashTable.Add($Key, $Value)
-    }
-}
-
 <#
     .SYNOPSIS
     Signs a .NET assembly, jar file, VSIX installer or ClickOnce application.
@@ -125,5 +111,19 @@ function Invoke-SigningService {
         # TODO: How should we check the response? Need to fail if the signing failed.
 
         return $FilePath
+    }
+}
+
+function Add-ToHashTableIfNotNull {
+    param(
+        [Parameter(Mandatory=$true)]
+        [HashTable] $HashTable,
+        [Parameter(Mandatory=$true)]
+        [string] $Key,
+        [string] $Value
+    )
+
+    if( $Value ) {
+        $HashTable.Add($Key, $Value)
     }
 }
