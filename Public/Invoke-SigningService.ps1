@@ -38,11 +38,15 @@ function Invoke-SigningService {
         [Parameter(Mandatory = $False)]
         [string] $Certificate = 'Master',
 
-        # Only used when signing vsix files. Valid values are sha1, sha256.
-        # For vsix targeting Visual Studio up to 2013, it should be sha1
-        # For vsix targeting Visual Studio 2015+, it should be sha256
-        # Note that it does not seem to be recommended to target VS 2013 and 2015 with the same vsix file
-        # Altough using sha1 in that case still seem to allow for the package to be installed in VS2015
+        # Algorithm used when signing files. Valid values are sha1, sha256.
+        # For vsix files:
+        #   if targeting Visual Studio up to 2013, it should be sha1
+        #   if targeting Visual Studio 2015+, it should be sha256
+        #   Note that it does not seem to be recommended to target VS 2013 and 2015 with the same vsix file...
+        # All other file types:
+        #   Recommendation is to use sha256 (as of 1 Jan 2016, IE flags sha1 as invalid signature)
+        #   Sha1 remains available, as it might remain useful for older OSes ?
+        #
         # Default value: sha1
         [Parameter(Mandatory = $False)]
         [ValidateSet('sha1', 'sha256')]
@@ -93,9 +97,7 @@ function Invoke-SigningService {
         Add-ToHashTableIfNotNull $Headers -Key 'Certificate' -Value $Certificate
         Add-ToHashTableIfNotNull $Headers -Key 'Description' -Value $Description
         Add-ToHashTableIfNotNull $Headers -Key 'MoreInfoUrl' -Value $MoreInfoUrl
-        if( $FileType -eq 'Vsix') {
-            Add-ToHashTableIfNotNull $Headers -Key 'HashAlgorithm' -Value $HashAlgorithm
-        }
+        Add-ToHashTableIfNotNull $Headers -Key 'HashAlgorithm' -Value $HashAlgorithm
 
         Write-Verbose "Signing $FilePath using $SigningServiceUrl"
         $Headers.Keys | ForEach { Write-Verbose "`t $_`: $($Headers[$_])" }
