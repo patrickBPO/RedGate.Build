@@ -47,10 +47,10 @@ function Invoke-SigningService {
         #   Recommendation is to use sha256 (as of 1 Jan 2016, IE flags sha1 as invalid signature)
         #   Sha1 remains available, as it might remain useful for older OSes ?
         #
-        # Default value: sha1
+        # Default value: sha256
         [Parameter(Mandatory = $False)]
         [ValidateSet('sha1', 'sha256')]
-        [string] $HashAlgorithm = 'sha1',
+        [string] $HashAlgorithm = 'sha256',
 
         # An optional description. Defaults to 'Red Gate Software Ltd.'.
         [Parameter(Mandatory = $False)]
