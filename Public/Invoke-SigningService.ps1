@@ -58,7 +58,11 @@ function Invoke-SigningService {
 
         # An optional URL that can be used to specify more information about the signed assembly by end-users. Defaults to 'http://www.red-gate.com'.
         [Parameter(Mandatory = $False)]
-        [string] $MoreInfoUrl = 'http://www.red-gate.com'
+        [string] $MoreInfoUrl = 'http://www.red-gate.com',
+
+        # If present, do not skip signing the file if it is already signed.
+        # If the file is already signed, do resign it.
+        [switch] $Force
     )
     begin {
         Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference', 'ProgressPreference'
@@ -74,7 +78,7 @@ function Invoke-SigningService {
         }
 
         # Only sign the file if it does not already have a valid Authenticode signature
-        if((Get-AuthenticodeSignature $FilePath).Status -eq 'Valid') {
+        if(!$Force.IsPresent -and (Get-AuthenticodeSignature $FilePath).Status -eq 'Valid') {
             Write-Verbose "Skipping signing $FilePath. It is already signed"
             return $FilePath
         }
