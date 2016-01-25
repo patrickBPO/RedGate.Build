@@ -112,6 +112,7 @@ Use sha1 if targeting VS 2013 and older. Use sha256 if targeting VS 2015+
             }
             '.jar' { $FileType = 'Jar' }
             '.application' { $FileType = 'ClickOnce' }
+            '.manifest' { $fileType = 'ClickOnce' }
             default { throw "Unsupported file type: $FilePath" }
         }
 
