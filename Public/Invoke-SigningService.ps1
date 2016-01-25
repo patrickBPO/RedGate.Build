@@ -38,19 +38,26 @@ function Invoke-SigningService {
         [Parameter(Mandatory = $False)]
         [string] $Certificate = 'Master',
 
-        # Algorithm used when signing files. Valid values are sha1, sha256.
-        # For vsix files:
-        #   if targeting Visual Studio up to 2013, it should be sha1
-        #   if targeting Visual Studio 2015+, it should be sha256
-        #   Note that it does not seem to be recommended to target VS 2013 and 2015 with the same vsix file...
-        # All other file types:
-        #   Recommendation is to use sha256 (as of 1 Jan 2016, IE flags sha1 as invalid signature)
-        #   Sha1 remains available, as it might remain useful for older OSes ?
+        # Allow overriding the signature algorithm.
+        # Valid values are sha1, sha256.
         #
-        # Default value: sha256
+        # If not set, the default is:
+        #
+        # For binary files (.dll, .exe):
+        #   dual sign using both sha1 and sha256.
+        # For vsix files:
+        #   vsix files cannot be dual signed. throw an error if -HashAlgorithm is not set.
+        #   if targeting Visual Studio up to 2013, select sha1
+        #   if targeting Visual Studio 2015+, select sha256
+        #   Until such days that Microsoft release VS updates that allow VS 2013 to recognize sha256 ? or VS 2015 to accept sha1 ?
+        # For msi, clickonce files:
+        #   msi, clickonce files cannot be dual signed.
+        #   Use sha256 by default
+        # For jar files:
+        #   use sha256 by default
         [Parameter(Mandatory = $False)]
         [ValidateSet('sha1', 'sha256')]
-        [string] $HashAlgorithm = 'sha256',
+        [string] $HashAlgorithm,
 
         # An optional description. Defaults to 'Red Gate Software Ltd.'.
         [Parameter(Mandatory = $False)]
@@ -87,9 +94,22 @@ function Invoke-SigningService {
         $FileType = $Null
         switch ([System.IO.Path]::GetExtension($FilePath)) {
             '.exe' { $FileType = 'Exe' }
-            '.msi' { $FileType = 'Exe' }
+            '.msi' {
+                $FileType = 'Exe'
+                #  msi files cannot be double signed at the moment.
+                #  so tell the signing service to use sha256
+                if(!$HashAlgorithm) { $HashAlgorithm = 'sha256' }
+            }
             '.dll' { $FileType = 'Exe' }
-            '.vsix' { $FileType = 'Vsix' }
+            '.vsix' {
+                $FileType = 'Vsix'
+                if(!$HashAlgorithm) {
+                    throw @'
+Cannot sign vsix package. -HashAlgorithm was not specified.
+Use sha1 if targeting VS 2013 and older. Use sha256 if targeting VS 2015+
+'@
+                }
+            }
             '.jar' { $FileType = 'Jar' }
             '.application' { $FileType = 'ClickOnce' }
             default { throw "Unsupported file type: $FilePath" }
