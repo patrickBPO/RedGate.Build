@@ -72,7 +72,8 @@ function Invoke-SigningService {
         [switch] $Force
     )
     begin {
-        Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference', 'ProgressPreference'
+        Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
+        $local:ProgressPreference = 'SilentlyContinue'
     }
 
     process {
