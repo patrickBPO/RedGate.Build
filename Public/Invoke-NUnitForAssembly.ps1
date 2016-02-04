@@ -88,8 +88,7 @@ function Invoke-NUnitForAssembly {
 
     # Tell teamcity to keep our test output logs as well. This could come in handy
     $assemblyFilename = Split-Path $AssemblyPath -Leaf
-    TeamCity-PublishArtifact "$AssemblyPath.$TestResultFilenamePattern.* => logs/tests/$assemblyFilename.$TestResultFilenamePattern/logs.zip"
-    TeamCity-PublishArtifact "-:$AssemblyPath.$TestResultFilenamePattern.coverage.snap" # Do not ever package the dotcover snapshot (it can be quite big)
+    TeamCity-PublishArtifact "$AssemblyPath.$TestResultFilenamePattern.*.txt, $AssemblyPath.$TestResultFilenamePattern.*.xml => logs/tests/$assemblyFilename.$TestResultFilenamePattern/logs.zip"
   }
 
 }
