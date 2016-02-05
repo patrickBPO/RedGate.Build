@@ -10,6 +10,7 @@
     bin\$(Configuration) is probably a decent default
 #>
 function Set-ProjectOutputPaths {
+    [CmdletBinding()]
     param(
         # The path to a .csproj or .vbproj file. (msbuild format)
         [string] $ProjectFile,
@@ -24,8 +25,14 @@ function Set-ProjectOutputPaths {
     $xml = [xml](Get-Content $ProjectFile)
 
     $xml.Project.PropertyGroup | where OutputPath | ForEach {
-        $_.OutputPath = $Value
+        if($_.OutputPath -ne $Value) {
+            Write-Verbose "Project: $ProfileFile. Updating OutputPath from '$($_.OutputPath)' to '$Value'" -verbose
+            $fileWasUpdated = $true
+            $_.OutputPath = $Value
+        }
     }
 
-    $xml.Save($ProjectFile)
+    if($fileWasUpdated) {
+        $xml.Save($ProjectFile)
+    }
 }
