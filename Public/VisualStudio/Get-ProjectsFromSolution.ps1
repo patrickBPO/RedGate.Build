@@ -43,8 +43,10 @@ function Get-ProjectsFromSolution
     }
 }
 
-function Get-ProjectTargetFramework {
+
+
+function Get-ProjectOutputPath {
     param( [string] $ProjectFile )
 
-    (([xml](Get-Content $ProjectFile)).project.propertygroup.TargetFrameworkVersion | select -first 1).tostring()
+    (([xml](Get-Content $ProjectFile)).project.propertygroup.OutputPath | select -first 1).tostring()
 }
