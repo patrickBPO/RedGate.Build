@@ -26,7 +26,7 @@ function Set-ProjectOutputPaths {
 
     $xml.Project.PropertyGroup | where OutputPath | ForEach {
         if($_.OutputPath -ne $Value) {
-            Write-Verbose "Project: $ProfileFile. Updating OutputPath from '$($_.OutputPath)' to '$Value'" -verbose
+            Write-Verbose "Project: $ProjectFile. Updating OutputPath from '$($_.OutputPath)' to '$Value'" -verbose
             $fileWasUpdated = $true
             $_.OutputPath = $Value
         }
