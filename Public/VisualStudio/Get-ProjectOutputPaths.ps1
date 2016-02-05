@@ -5,7 +5,7 @@
 .DESCRIPTION
     Open the project file, read and return the value of OutputPath
 #>
-function Get-ProjectTargetFramework {
+function Get-ProjectOutputPaths {
     param(
         # The path to a .csproj or .vbproj file. (msbuild format)
         [string] $ProjectFile
