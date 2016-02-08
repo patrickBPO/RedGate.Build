@@ -3,7 +3,7 @@
     Return the OutputPath value set in a VS project file
 
 .DESCRIPTION
-    Open the project file, read and return the value of OutputPath
+    Open the project file, read and return the value(s) of OutputPath
 #>
 function Get-ProjectOutputPaths {
     param(
@@ -11,5 +11,5 @@ function Get-ProjectOutputPaths {
         [string] $ProjectFile
     )
 
-    (([xml](Get-Content $ProjectFile)).project.propertygroup.OutputPath | select -first 1).tostring()
+    @(([xml](Get-Content $ProjectFile)).Project.PropertyGroup.OutputPath)
 }
