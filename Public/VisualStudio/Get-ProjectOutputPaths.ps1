@@ -11,5 +11,5 @@ function Get-ProjectOutputPaths {
         [string] $ProjectFile
     )
 
-    @(([xml](Get-Content $ProjectFile)).Project.PropertyGroup.OutputPath)
+    @(([xml](Get-Content $ProjectFile)).Project.PropertyGroup.OutputPath | where { $_ -ne $null })
 }
