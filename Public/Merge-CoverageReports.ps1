@@ -13,15 +13,19 @@ function Merge-CoverageReports {
   param(
     # The folder containing the coverage reports to be merged.
     [Parameter(Mandatory=$true)]
-    [string] $OutputDir
+    [string] $OutputDir,
+
+    # Also find coverage reports in child folders.
+    [switch] $Recurse
   )
 
   $DotCoverPath = Get-DotCoverExePath
 
   $MergedSnapshotPath = "$OutputDir\coverage.dcvr"
-  $snapshots = (Get-ChildItem $OutputDir -Filter *.coverage.snap).FullName -join ';'
+  $snapshots = (Get-ChildItem $OutputDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent).FullName
+  Write-Verbose "Merging snapshots: `r`n$snapshots`r`n`r`nto $MergedSnapshotPath"
 
-  & $DotCoverPath merge /Source="$snapshots" /Output="$MergedSnapshotPath"
+  & $DotCoverPath merge /Source="$($snapshots -join ';')" /Output="$MergedSnapshotPath"
 
   if( $env:TEAMCITY_VERSION -eq $null ) {
     # Create an HTML report if running outside of Teamcity to help with debugging
