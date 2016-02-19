@@ -33,8 +33,7 @@ function Get-ProjectsFromSolution
                 ForEach {
                     $filepath = $_.Trim(' "')
                     [pscustomobject] @{
-                        Project = $filepath
-                        TargetFrameworkVersion = (Get-ProjectTargetFramework $filepath)
+                        Project = (Resolve-Path $filepath).Path
                     }
                 }
         } finally {
