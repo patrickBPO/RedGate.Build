@@ -12,6 +12,6 @@ function Get-ProjectTargetFramework {
         [string] $ProjectFile
     )
 
-    Write-Verbose "Project: $ProjectFile. Retrieving TargetFrameworkVersion"
-    (([xml](Get-Content $ProjectFile)).project.propertygroup.TargetFrameworkVersion | select -first 1).tostring()
+    ((LoadProjectFile $ProjectFile).project.propertygroup.TargetFrameworkVersion | select -first 1).tostring()
+    
 }
