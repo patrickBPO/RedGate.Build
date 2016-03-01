@@ -14,7 +14,7 @@ Describe 'New-NuGetPackageVersion' {
             New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'SomeBranch' | Should Be '1.2.3.4-SomeBranch'
         }
         it 'should shorten the pre-release suffix (by truncating) if the BranchName is too long' {
-            New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'SomeBranchNameThatsTooLong' | Should Be '1.2.3.4-SomeBranchNameThats'
+            New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'SomeBranchNameThatsTooLong' | Should Be '1.2.3.4-SomeBranchNameThatsT'
         }
         it 'should replace "/" in the pre-release suffix by "-"' {
             New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'build/fixing-it' | Should Be '1.2.3.4-build-fixing-it'

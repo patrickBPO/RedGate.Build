@@ -48,8 +48,8 @@ function New-NuGetPackageVersion
     }
 
     # Otherwise establish the pre-release suffix from the branch name.
-    $PreReleaseSuffix = "-$BranchName"
-
+    $PreReleaseSuffix = $BranchName
+    
     # Remove invalid characters from the suffix.
     $PreReleaseSuffix = $PreReleaseSuffix -replace '[/]', '-'
     $PreReleaseSuffix = $PreReleaseSuffix -replace '[^0-9A-Za-z-]', ''
@@ -61,6 +61,6 @@ function New-NuGetPackageVersion
     $Major = $Version.Major
     $Minor = $Version.Minor
     $Patch = $Version.Build
-    $Revision = [string]$Version.Revision
-    return "$Major.$Minor.$Patch.$Revision$PreReleaseSuffix"
+    $Revision = $Version.Revision
+    return "$Major.$Minor.$Patch.$Revision-$PreReleaseSuffix"
 }
