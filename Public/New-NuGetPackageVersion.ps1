@@ -48,28 +48,19 @@ function New-NuGetPackageVersion
     }
 
     # Otherwise establish the pre-release suffix from the branch name.
-    $PreReleaseSuffix = "-$BranchName"
-
+    $PreReleaseSuffix = $BranchName
+    
     # Remove invalid characters from the suffix.
+    $PreReleaseSuffix = $PreReleaseSuffix -replace '[/]', '-'
     $PreReleaseSuffix = $PreReleaseSuffix -replace '[^0-9A-Za-z-]', ''
 
     # Shorten the suffix if necessary, to satisfy NuGet's 20 character limit.
-    $Revision = [string]$Version.Revision
-    $MaxLength = 20 - $Revision.Length
-    if ($PreReleaseSuffix.Length -gt $MaxLength)
-    {
-        $PreReleaseSuffix = $PreReleaseSuffix -replace '[aeiou]', ''
-
-        # If the suffix is still too long after we've stripped out the vovels, truncate it.
-        if ($PreReleaseSuffix.Length -gt $MaxLength)
-        {
-            $PreReleaseSuffix = $PreReleaseSuffix.Substring(0, $MaxLength)
-        }
-    }
+    $PreReleaseSuffix = $PreReleaseSuffix.SubString(0, [math]::min(20, $PreReleaseSuffix.Length))
 
     # And finally compose the full NuGet package version.
     $Major = $Version.Major
     $Minor = $Version.Minor
     $Patch = $Version.Build
-    return "$Major.$Minor.$Patch$PreReleaseSuffix$Revision"
+    $Revision = $Version.Revision
+    return "$Major.$Minor.$Patch.$Revision-$PreReleaseSuffix"
 }
