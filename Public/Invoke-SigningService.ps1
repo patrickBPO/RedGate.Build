@@ -1,24 +1,20 @@
 <#
-    .SYNOPSIS
-    Signs a .NET assembly, jar file, VSIX installer or ClickOnce application.
+.SYNOPSIS
+  Signs a .NET assembly, jar file, VSIX installer or ClickOnce application.
+.DESCRIPTION
+  Signs a .NET assembly, jar file, VSIX installer or ClickOnce application using the Redgate signing service.
+.OUTPUTS
+  The FilePath parameter, to enable call chaining.
+.EXAMPLE
+  $AssemblyPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.dll"
+  Invoke-SigningService -SigningServiceUrl 'https://signingservice.internal/sign' -AssemblyPath $AssemblyPath
 
-    .DESCRIPTION
-    Signs a .NET assembly, jar file, VSIX installer or ClickOnce application using the Redgate signing service.
+  This shows how to sign a .NET dll, with the signing service URL being explicitly stated.
+.EXAMPLE
+  $VsixPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.Installer.vsix"
+  Invoke-SigningService -VsixPath $AssemblyPath -HashAlgorithm SHA1
 
-    .OUTPUTS
-    The FilePath parameter, to enable call chaining.
-
-    .EXAMPLE
-    $AssemblyPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.dll"
-    Invoke-SigningService -SigningServiceUrl 'https://signingservice.internal/sign' -AssemblyPath $AssemblyPath
-
-    This shows how to sign a .NET dll, with the signing service URL being explicitly stated.
-
-    .EXAMPLE
-    $VsixPath = "$SourceDir\Build\$Configuration\RedGate.MyAwesomeProduct.Installer.vsix"
-    Invoke-SigningService -VsixPath $AssemblyPath -HashAlgorithm SHA1
-
-    This shows how to sign a Visual Studio Installer file. The signing service URL is taken from the $env:SigningServiceUrl environment variable that is present on all of the build agents.
+  This shows how to sign a Visual Studio Installer file. The signing service URL is taken from the $env:SigningServiceUrl environment variable that is present on all of the build agents.
 #>
 function Invoke-SigningService {
     [CmdletBinding()]

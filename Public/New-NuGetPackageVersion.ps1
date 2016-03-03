@@ -1,24 +1,20 @@
 #requires -Version 2
 
 <#
-    .SYNOPSIS
-    Obtains a NuGet package version based on the build version number and branch name.
+.SYNOPSIS
+  Obtains a NuGet package version based on the build version number and branch name.
+.DESCRIPTION
+  Obtains a NuGet package version based on a 4-digit build version number, the branch name and whether or not the branch is the default branch.
+.OUTPUTS
+  A NuGet version string based on the input parameters. The string is also suitable for use as an assembly's AssemblyInformationalVersion attribute value.
+.EXAMPLE
+  New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'master' -IsDefaultBranch $True
 
-    .DESCRIPTION
-    Obtains a NuGet package version based on a 4-digit build version number, the branch name and whether or not the branch is the default branch.
+  Returns '1.2.3.4'. This shows how this cmdlet might be invoked on the default master branch with a four digit version number.
+.EXAMPLE
+  New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'SomeBranch' -IsDefaultBranch $False
 
-    .OUTPUTS
-    A NuGet version string based on the input parameters. The string is also suitable for use as an assembly's AssemblyInformationalVersion attribute value.
-
-    .EXAMPLE
-    New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'master' -IsDefaultBranch $True
-
-    Returns '1.2.3.4'. This shows how this cmdlet might be invoked on the default master branch with a four digit version number.
-
-    .EXAMPLE
-    New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'SomeBranch' -IsDefaultBranch $False
-
-    Returns '1.2.3-SomeBranch4'. This shows how this cmdlet might be invoked on a feature branch, resulting in a pre-release version string.
+  Returns '1.2.3-SomeBranch4'. This shows how this cmdlet might be invoked on a feature branch, resulting in a pre-release version string.
 #>
 function New-NuGetPackageVersion
 {

@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Convert msbuild errors and warnings to powershell ones.
+  Convert msbuild errors and warnings to powershell ones.
 .DESCRIPTION
-    Parse input and look for
-        * : warning *:* to detect warnings
-        * : error *:* to detect errors
-    And convert them using Write-Warning and Write-Error
+  Parse input and look for
+      * : warning *:* to detect warnings
+      * : error *:* to detect errors
+  And convert them using Write-Warning and Write-Error
 #>
 function Format-WarningsAndErrors {
     [CmdletBinding()]
