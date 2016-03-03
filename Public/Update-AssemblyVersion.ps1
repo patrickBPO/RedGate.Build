@@ -1,4 +1,3 @@
-#requires -Version 3
 <#
 .SYNOPSIS
   Updates the AssemblyVersion, AssemblyFileVersion and AssemblyInformationalVersion attributes in a source file.
@@ -19,6 +18,7 @@
 .EXAMPLE
   'AssemblyInfo.cs' | Update-AssemblyVersion -Version '1.2.0.12443' -InformationalVersion '1.2.0-prerelease'
 #>
+#requires -Version 3
 function Update-AssemblyVersion
 {
     [CmdletBinding()]

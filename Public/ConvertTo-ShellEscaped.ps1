@@ -1,4 +1,3 @@
-#requires -Version 2
 <#
 .SYNOPSIS
   Shell-escapes one or more strings for use in a command-line when starting a process.
@@ -17,6 +16,7 @@
 
   -path "C:\Program Files\\" -db "Data Source=local;Application Name=\"My app\""
 #>
+#requires -Version 2
 function ConvertTo-ShellEscaped
 {
     [CmdletBinding()]
