@@ -16,7 +16,13 @@
 .OUTPUTS
   The input source file path.
 .EXAMPLE
-  'AssemblyInfo.cs' | Update-AssemblyVersion -Version '1.2.0.12443' -InformationalVersion '1.2.0-prerelease'
+  'AssemblyInfo.cs' | Update-AssemblyVersion -Version '1.2.0.12443'
+
+  This shows the minimal correct usage, whereby the SourceFilePath is piped to the cmdlet, along with the require Version parameter.
+.EXAMPLE
+  'AssemblyInfo.cs' | Update-AssemblyVersion -Version $BuildNumber -InformationalVersion $NuGetPackageVersion
+
+  This shows more typical usage, whereby Version is provided by a the curent build number and InformationalVersion is provided by the NuGet package version (which can include a pre-release package suffix).
 #>
 #requires -Version 3
 function Update-AssemblyVersion
@@ -40,7 +46,7 @@ function Update-AssemblyVersion
     )
 
     if (!$FileVersion) { $FileVersion = $Version }
-    if (!$InformationalVersion) { $InformationalVersion = [string] $Version }
+    if (!$InformationalVersion) { $InformationalVersion = [string] $FileVersion }
 
     Write-Verbose "Updating version numbers in file $SourceFilePath"
     Write-Verbose "  Version = $Version"
@@ -49,9 +55,9 @@ function Update-AssemblyVersion
 
     $CurrentContent = Get-Content $SourceFilePath -Encoding $Encoding -Raw
     $NewContent = $CurrentContent `
-        -replace '(?<=AssemblyVersion\(")[0-9\.\*]*(?="\))', $Version.ToString() `
-        -replace '(?<=AssemblyFileVersion\(")[0-9\.\*]*(?="\))', $FileVersion.ToString() `
-        -replace '(?<=AssemblyInformationalVersion\(")[a-zA-Z0-9\.\-]*(?="\))', $InformationalVersion
+        -replace '(?<=AssemblyVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $Version.ToString() `
+        -replace '(?<=AssemblyFileVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $FileVersion.ToString() `
+        -replace '(?<=AssemblyInformationalVersion\s*\(\s*@?")[a-zA-Z0-9\.\*\-]*(?="\s*\))', $InformationalVersion
     $NewContent | Out-File $SourceFilePath -Encoding $Encoding
 	
 	return $SourceFilePath
