@@ -1,31 +1,22 @@
-#requires -Version 2
-
 <#
-        .SYNOPSIS
-        Shell-escapes one or more strings for use in a command-line when starting a process.
+.SYNOPSIS
+  Shell-escapes one or more strings for use in a command-line when starting a process.
+.DESCRIPTION
+  Given one or more argument strings, for each argument, this function will escape double-quote characters and some backslash characters, and surround the string with double-quotes if necessary. The results are then concatenated, using a single ' ' separator character.
 
-        .DESCRIPTION
-        Given one or more argument strings, for each argument, this function will escape double-quote characters and some backslash characters, and surround the string with double-quotes if necessary. The results are then concatenated, using a single ' ' separator character.
+  See http://msdn.microsoft.com/en-us/library/a1y7w461.aspx for details on the necessary escaping.
+.PARAMETER Arguments
+  A list of raw strings to be escaped. Each individual string will be shell-escaped. The resulting escaped strings are then concatenated, using a single ' ' separator character.
+.EXAMPLE
+  ConvertTo-ShellEscaped 'C:\Program Files\'
 
-        See http://msdn.microsoft.com/en-us/library/a1y7w461.aspx for details on the necessary escaping.
+  "C:\Program Files\\"
+.EXAMPLE
+  ConvertTo-ShellEscaped @('-path', 'C:\Program Files\', '-db', 'Data Source=local;Application Name="My app"')
 
-        .PARAMETER Arguments
-        A list of raw strings to be escaped. Each individual string will be shell-escaped. The resulting escaped strings are then concatenated, using a single ' ' separator character.
-
-        .EXAMPLE
-        ConvertTo-ShellEscaped 'C:\Program Files\'
-
-        "C:\Program Files\\"
-
-        .EXAMPLE
-        ConvertTo-ShellEscaped @('-path', 'C:\Program Files\', '-db', 'Data Source=local;Application Name="My app"')
-
-        -path "C:\Program Files\\" -db "Data Source=local;Application Name=\"My app\""
-
-        .NOTES
-        Author: Chris Lambrou
-        Copyright 2015, Red Gate Software Limited
+  -path "C:\Program Files\\" -db "Data Source=local;Application Name=\"My app\""
 #>
+#requires -Version 2
 function ConvertTo-ShellEscaped
 {
     [CmdletBinding()]

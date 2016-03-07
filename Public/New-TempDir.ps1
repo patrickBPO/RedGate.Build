@@ -1,12 +1,10 @@
 <#
-        .SYNOPSIS
-        Creates a new empty temp directory.
-
-        .DESCRIPTION
-        Creates a new empty temp directory.
-
-        .OUTPUTS
-        The path of the newly created temporary directory.
+.SYNOPSIS
+  Creates a new empty temp directory.
+.DESCRIPTION
+  Creates a new empty temp directory.
+.OUTPUTS
+  The path of the newly created temporary directory.
 #>
 function New-TempDir 
 {

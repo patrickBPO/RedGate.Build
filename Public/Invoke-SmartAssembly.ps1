@@ -6,8 +6,8 @@
   2. Call smartassembly.com
 .EXAMPLE
   Invoke-SmartAssembly -ProjectPath D:\myproject.{sa}proj -SmartAssemblyVersion 6.9.0
-    Restore the SmartAssembly nuget package version 6.9.0 and call
-    .\packages\SmartAssembly.6.9.0\tools\SmartAssembly.com D:\myproject.{sa}proj
+
+  Restore the SmartAssembly nuget package version 6.9.0 and call .\packages\SmartAssembly.6.9.0\tools\SmartAssembly.com D:\myproject.{sa}proj
 #>
 function Invoke-SmartAssembly {
   [CmdletBinding()]

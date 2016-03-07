@@ -1,14 +1,12 @@
 <#
 .SYNOPSIS
-Remove ignored tests from a NUnit test results xml file.
-
+  Remove ignored tests from a NUnit test results xml file.
 .DESCRIPTION
-1. Load the NUnit tests results file
-2. Find any ignored tests (optional: matching a reason from -ReasonsIgnored) and remove them
-3  Save back to xml.
-
+  1. Load the NUnit tests results file
+  2. Find any ignored tests (optional: matching a reason from -ReasonsIgnored) and remove them
+  3.  Save back to xml.
 .EXAMPLE
-Remove-IgnoredTests -TestResultsPath 'D:\TestResults.xml' -ReasonsIgnored 'Why are we writing tests like *'
+  Remove-IgnoredTests -TestResultsPath 'D:\TestResults.xml' -ReasonsIgnored 'Why are we writing tests like *'
 #>
 function Remove-IgnoredTests {
   [CmdletBinding()]

@@ -7,15 +7,14 @@
 .EXAMPLE
   New-ZipArchive -OutputFile .\Build\Build.zip -BasePath .\Build -Files ".\Build\Release\*.exe", ".\Build\Release\*.dll"
 
-    Packages all .exe and .dll files within Build\Release\ to a zip file created at Build\Build.zip
-    Strips the -BasePath value from the file paths in the archive.
-    Paths in the archive will be:
-      Release\myproject.exe
-      Release\mydll1.dll
-      Release\mydll2.dll
-
+  Packages all .exe and .dll files within Build\Release\ to a zip file created at Build\Build.zip
+  Strips the -BasePath value from the file paths in the archive.
+  Paths in the archive will be:
+    Release\myproject.exe
+    Release\mydll1.dll
+    Release\mydll2.dll
 .NOTES
-    Currently zipping using 7z.exe, just because it proved faster at the time of writing as the equivalent powershell based solutions.
+  Currently zipping using 7z.exe, just because it proved faster at the time of writing as the equivalent powershell based solutions.
 #>
 function New-ZipArchive {
     [CmdletBinding()]
