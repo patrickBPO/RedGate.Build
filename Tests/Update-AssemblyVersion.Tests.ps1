@@ -4,17 +4,17 @@
 Describe 'Update-AssemblyVersion' {
 
 	function Set-FileContents($Contents) {
-		$Contents | Out-File 'TestDrive:\TestFile.txt'
+		[System.IO.File]::WriteAllText('C:\Temp\TestFile.txt', $Contents)
 	}
 	
 	function Get-FileContents() {
-		return (Get-Content 'TestDrive:\TestFile.txt' -Raw).Trim()
+		return [System.IO.File]::ReadAllText('C:\TEMP\TestFile.txt')
 	}
 	
 	Context 'setting the AssemblyVersion' {
 		function Check($Original, $Expected) {
 			Set-FileContents($Original)
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
 			Get-FileContents | Should Be $Expected
 		}
 		It 'should succeed with a four-part version number' {
@@ -46,7 +46,7 @@ Describe 'Update-AssemblyVersion' {
 	Context 'setting the AssemblyFileVersion' {
 		function Check($Original, $Expected) {
 			Set-FileContents($Original)
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' -FileVersion '1.2.3.4'
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' -FileVersion '1.2.3.4'
 			Get-FileContents | Should Be $Expected
 		}
 		It 'should succeed with a four-part version number' {
@@ -78,7 +78,7 @@ Describe 'Update-AssemblyVersion' {
 	Context 'setting the AssemblyInformationalVersion' {
 		function Check($Original, $Expected) {
 			Set-FileContents($Original)
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' `
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' `
 			                                                   -FileVersion '9.10.11.12' `
 															   -InformationalVersion '1.2.3.4'
 			Get-FileContents | Should Be $Expected
@@ -115,17 +115,17 @@ Describe 'Update-AssemblyVersion' {
 	Context 'inheriting Version numbers for optional Version parameters' {
 		It 'should inherit the AssemblyFileVersion from the AssemblyVersion' {
 			Set-FileContents('AssemblyFileVersion("0.0.0.0")')
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
 			Get-FileContents | Should Be 'AssemblyFileVersion("1.2.3.4")'
 		}
 		It 'should inherit the AssemblyInformationalVersion from the AssemblyFileVersion' {
 			Set-FileContents('AssemblyInformationalVersion("0.0.0.0")')
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' -FileVersion '1.2.3.4'
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '5.6.7.8' -FileVersion '1.2.3.4'
 			Get-FileContents | Should Be 'AssemblyInformationalVersion("1.2.3.4")'
 		}
 		It 'should inherit the AssemblyInformationalVersion from the AssemblyVersion when the AssemblyInformationalVersion is absent' {
 			Set-FileContents('AssemblyInformationalVersion("0.0.0.0")')
-			'TestDrive:\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
+			'C:\TEMP\TestFile.txt' | Update-AssemblyVersion -Version '1.2.3.4'
 			Get-FileContents | Should Be 'AssemblyInformationalVersion("1.2.3.4")'
 		}
 	}

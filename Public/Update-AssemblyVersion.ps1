@@ -12,7 +12,17 @@
  .PARAMETER InformationalVersion
   The optional Assembly Informational Version to be injected into the source file. If unspecified, defaults to the value of the Version parameter.
 .PARAMETER Encoding
-  The optional encoding of the source file. If unspecified, defaults to 'UTF8'. Valid values include 'Unicode', 'Byte', 'BigEndianUnicode', 'UTF8', 'UTF7', 'UTF32', 'Ascii', 'Default', 'Oem' and 'BigEndianUTF32'.
+  The optional encoding of the source file. Valid values include the following:
+   - 'Ascii'
+   - 'BigEndianUnicode'
+   - 'BigEndianUTF32'
+   - 'Default'
+   - 'Unicode'
+   - 'UTF7'
+   - 'UTF8' : Unlike System.Text.Encoding.UTF8, this provides an instance that does not emit a BOM.
+   - 'UTF8WithBom' : Use this if you actually want an encoder that emits the UTF8 BOM.
+   - 'UTF32'
+   - Any value from the Name column in the table found at https://msdn.microsoft.com/en-us/library/system.text.encoding.aspx 
 .OUTPUTS
   The input source file path.
 .EXAMPLE
@@ -53,12 +63,17 @@ function Update-AssemblyVersion
     Write-Verbose "  FileVersion = $FileVersion"
     Write-Verbose "  InformationalVersion = $InformationalVersion"
 
-    $CurrentContent = Get-Content $SourceFilePath -Encoding $Encoding -Raw
-    $NewContent = $CurrentContent `
+    # Resolve the encoding string to an actual System.Text.Encoding instance.
+    $EncodingInstance = Get-Encoding $Encoding
+
+    # Read the file contents, update the assembly version attributes, then save it again.
+    $CurrentContents = [System.IO.File]::ReadAllText($SourceFilePath, $EncodingInstance)
+    $NewContents = $CurrentContents `
         -replace '(?<=AssemblyVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $Version.ToString() `
         -replace '(?<=AssemblyFileVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $FileVersion.ToString() `
         -replace '(?<=AssemblyInformationalVersion\s*\(\s*@?")[a-zA-Z0-9\.\*\-]*(?="\s*\))', $InformationalVersion
-    $NewContent | Out-File $SourceFilePath -Encoding $Encoding
+    [System.IO.File]::WriteAllText($SourceFilePath, $NewContents, $EncodingInstance)
 	
+    # Return the input SoureFilePath to enable pilelining.
 	return $SourceFilePath
 }
