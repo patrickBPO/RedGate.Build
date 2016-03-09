@@ -55,8 +55,13 @@ function Update-AssemblyVersion
         [string] $Encoding = 'UTF8'
     )
 
+    # Resolve SourceFilePath to an absolute path, and make sure it exists.
+    $SourceFilePath = Resolve-Path $SourceFilePath
+
+    # Fallback to defaults for FileVersion and InformationalVersion if necessary.
     if (!$FileVersion) { $FileVersion = $Version }
     if (!$InformationalVersion) { $InformationalVersion = [string] $FileVersion }
+
 
     Write-Verbose "Updating version numbers in file $SourceFilePath"
     Write-Verbose "  Version = $Version"
