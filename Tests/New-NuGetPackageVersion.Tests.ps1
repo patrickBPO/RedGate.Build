@@ -5,13 +5,19 @@ Describe 'New-NuGetPackageVersion' {
         It 'should return the Version' {
             New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $True -BranchName 'master' | Should Be '1.2.3.4'
         }
+        It 'should return the three part Version' {
+            New-NuGetPackageVersion -Version '1.2.3' -IsDefaultBranch $True -BranchName 'master' | Should Be '1.2.3'
+        }
     }
     Context 'When IsDefaultBranch is false' {
         it 'should throw when BranchName is empty' {
             { New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName '' } | Should Throw
         }
-        it 'should use the BranchName without the revision number as the pre-release suffix' {
+        it 'should use the BranchName and the suffix' {
             New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'SomeBranch' | Should Be '1.2.3.4-SomeBranch'
+        }
+        it 'should use the BranchName and the suffix for three part Version' {
+            New-NuGetPackageVersion -Version '1.2.3' -IsDefaultBranch $False -BranchName 'SomeBranch' | Should Be '1.2.3-SomeBranch'
         }
         it 'should shorten the pre-release suffix (by truncating) if the BranchName is too long' {
             New-NuGetPackageVersion -Version '1.2.3.4' -IsDefaultBranch $False -BranchName 'SomeBranchNameThatsTooLong' | Should Be '1.2.3.4-SomeBranchNameThatsT'

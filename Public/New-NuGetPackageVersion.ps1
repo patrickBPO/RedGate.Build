@@ -14,7 +14,11 @@
 .EXAMPLE
   New-NuGetPackageVersion -Version '1.2.3.4' -BranchName 'SomeBranch' -IsDefaultBranch $False
 
-  Returns '1.2.3-SomeBranch4'. This shows how this cmdlet might be invoked on a feature branch, resulting in a pre-release version string.
+  Returns '1.2.3.4-SomeBranch'. This shows how this cmdlet might be invoked on a feature branch, resulting in a pre-release version string.
+.EXAMPLE
+  New-NuGetPackageVersion -Version '1.2.3' -BranchName 'SomeBranch' -IsDefaultBranch $False
+
+  Returns '1.2.3-SomeBranch. This shows how this cmdlet might be invoked on a semantically versioned feature branch, resulting in a pre-release version string.
 #>
 function New-NuGetPackageVersion
 {
@@ -53,10 +57,6 @@ function New-NuGetPackageVersion
     # Shorten the suffix if necessary, to satisfy NuGet's 20 character limit.
     $PreReleaseSuffix = $PreReleaseSuffix.SubString(0, [math]::min(20, $PreReleaseSuffix.Length))
 
-    # And finally compose the full NuGet package version.
-    $Major = $Version.Major
-    $Minor = $Version.Minor
-    $Patch = $Version.Build
-    $Revision = $Version.Revision
-    return "$Major.$Minor.$Patch.$Revision-$PreReleaseSuffix"
+    # And finally compose the full NuGet package version - this supports 3 part version numbers
+    return "$Version-$PreReleaseSuffix"
 }
