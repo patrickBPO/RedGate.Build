@@ -4,6 +4,7 @@
 # Create the packages folder where nuget packages used by this module will be installed.
 $PackagesDir = New-Item -Path "$PSScriptRoot\..\packages" -ItemType Directory -Force
 
+$TempFolderPath = New-Item "$PSScriptRoot\..\.temp" -ItemType Directory -Force | Select -ExpandProperty FullName
 
 # Store the path to nuget.exe.
 $NugetExe = Resolve-Path "$PSScriptRoot\nuget.exe"

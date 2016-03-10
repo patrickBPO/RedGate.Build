@@ -6,9 +6,9 @@
 .OUTPUTS
   The path of the newly created temporary directory.
 #>
-function New-TempDir 
+function New-TempDir
 {
-    $Path = "$env:TEMP\RedGate.Build\$([System.IO.Path]::GetRandomFileName())"
+    $Path = "$TempFolderPath\$([System.IO.Path]::GetRandomFileName())"
     Write-Verbose "Creating temp dir: $Path"
     return [string] (mkdir $Path)
 }
