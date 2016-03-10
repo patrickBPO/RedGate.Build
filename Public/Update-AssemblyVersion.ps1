@@ -45,9 +45,6 @@ function Update-AssemblyVersion
         [System.Text.Encoding] $Encoding
     )
 
-    # Resolve SourceFilePath to an absolute path, and make sure it exists.
-    $ResolvedSourceFilePath = Resolve-Path $SourceFilePath
-
     # If no encoding is specified, use UTF8 without emitting a BOM.
     if (!$Encoding) {
         $Encoding = New-Object 'System.Text.UTF8Encoding' $False
@@ -64,7 +61,7 @@ function Update-AssemblyVersion
     Write-Verbose "  InformationalVersion = $InformationalVersion"
 
     # Read the file contents, update the assembly version attributes, then save it again.
-    $ResolvedSourceFilePath | ForEach-Object {
+    Resolve-Path $SourceFilePath | ForEach-Object {
         Write-Verbose "  SourceFile = $_"
         $CurrentContents = [System.IO.File]::ReadAllText($_, $Encoding)
         $NewContents = $CurrentContents `
