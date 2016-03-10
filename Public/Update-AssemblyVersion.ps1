@@ -12,19 +12,9 @@
  .PARAMETER InformationalVersion
   The optional Assembly Informational Version to be injected into the source file. If unspecified, defaults to the value of the Version parameter.
 .PARAMETER Encoding
-  The optional encoding of the source file. Valid values include the following:
-   - 'Ascii'
-   - 'BigEndianUnicode'
-   - 'BigEndianUTF32'
-   - 'Default'
-   - 'Unicode'
-   - 'UTF7'
-   - 'UTF8' : Unlike System.Text.Encoding.UTF8, this provides an instance that does not emit a BOM.
-   - 'UTF8WithBom' : Use this if you actually want an encoder that emits the UTF8 BOM.
-   - 'UTF32'
-   - Any value from the Name column in the table found at https://msdn.microsoft.com/en-us/library/system.text.encoding.aspx 
+  The optional encoding of the source file. Defaults to UTF8 without emitting a BOM [i.e. new UTF8Encoding(false)].
 .OUTPUTS
-  The input source file path.
+  The input SourceFilePath parameter, to facilitate command chaining.
 .EXAMPLE
   'AssemblyInfo.cs' | Update-AssemblyVersion -Version '1.2.0.12443'
 
@@ -52,32 +42,37 @@ function Update-AssemblyVersion
         [string] $InformationalVersion,
 
         [Parameter(Mandatory = $False)]
-        [string] $Encoding = 'UTF8'
+        [System.Text.Encoding] $Encoding
     )
 
     # Resolve SourceFilePath to an absolute path, and make sure it exists.
-    $SourceFilePath = Resolve-Path $SourceFilePath
+    $ResolvedSourceFilePath = Resolve-Path $SourceFilePath
+
+    # If no encoding is specified, use UTF8 without emitting a BOM.
+    if (!$Encoding) {
+        $Encoding = New-Object 'System.Text.UTF8Encoding' $False
+    }
 
     # Fallback to defaults for FileVersion and InformationalVersion if necessary.
     if (!$FileVersion) { $FileVersion = $Version }
     if (!$InformationalVersion) { $InformationalVersion = [string] $FileVersion }
 
-
-    Write-Verbose "Updating version numbers in file $SourceFilePath"
+    # Log what we're about to do.
+    Write-Verbose 'Updating version numbers:'
     Write-Verbose "  Version = $Version"
     Write-Verbose "  FileVersion = $FileVersion"
     Write-Verbose "  InformationalVersion = $InformationalVersion"
 
-    # Resolve the encoding string to an actual System.Text.Encoding instance.
-    $EncodingInstance = Get-Encoding $Encoding
-
     # Read the file contents, update the assembly version attributes, then save it again.
-    $CurrentContents = [System.IO.File]::ReadAllText($SourceFilePath, $EncodingInstance)
-    $NewContents = $CurrentContents `
-        -replace '(?<=AssemblyVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $Version.ToString() `
-        -replace '(?<=AssemblyFileVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $FileVersion.ToString() `
-        -replace '(?<=AssemblyInformationalVersion\s*\(\s*@?")[a-zA-Z0-9\.\*\-]*(?="\s*\))', $InformationalVersion
-    [System.IO.File]::WriteAllText($SourceFilePath, $NewContents, $EncodingInstance)
+    $ResolvedSourceFilePath | ForEach-Object {
+        Write-Verbose "  SourceFile = $_"
+        $CurrentContents = [System.IO.File]::ReadAllText($_, $Encoding)
+        $NewContents = $CurrentContents `
+            -replace '(?<=AssemblyVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $Version.ToString() `
+            -replace '(?<=AssemblyFileVersion\s*\(\s*@?")[0-9\.\*]*(?="\s*\))', $FileVersion.ToString() `
+            -replace '(?<=AssemblyInformationalVersion\s*\(\s*@?")[a-zA-Z0-9\.\*\-]*(?="\s*\))', $InformationalVersion
+        [System.IO.File]::WriteAllText($_, $NewContents, $Encoding)
+    }
 	
     # Return the input SoureFilePath to enable pilelining.
 	return $SourceFilePath
