@@ -45,7 +45,8 @@ function Update-AssemblyVersion
         [System.Text.Encoding] $Encoding
     )
 
-    # If no encoding is specified, use UTF8 without emitting a BOM.
+    # If no encoding is specified, use UTF8 without emitting a BOM. We use this rather than
+    # System.Text.Encoding.UTF8 because that emits BOMs, against recommended practice.
     if (!$Encoding) {
         $Encoding = New-Object 'System.Text.UTF8Encoding' $False
     }
