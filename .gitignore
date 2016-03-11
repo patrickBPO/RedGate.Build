@@ -2,3 +2,4 @@
 *.exe
 Pester
 TestResults.xml
+.temp/
