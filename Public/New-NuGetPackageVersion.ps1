@@ -55,7 +55,9 @@ function New-NuGetPackageVersion
     $PreReleaseSuffix = $PreReleaseSuffix -replace '[^0-9A-Za-z-]', ''
 
     # Shorten the suffix if necessary, to satisfy NuGet's 20 character limit.
-    $PreReleaseSuffix = $PreReleaseSuffix.SubString(0, [math]::min(20, $PreReleaseSuffix.Length))
+    if ($PreReleaseSuffix.Length -gt 20) {
+        $PreReleaseSuffix = $PreReleaseSuffix.SubString(0, 20)
+    }
 
     # And finally compose the full NuGet package version - this supports 3 part version numbers
     return "$Version-$PreReleaseSuffix"
