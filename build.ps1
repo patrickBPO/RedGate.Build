@@ -40,11 +40,16 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' #important for Invoke-WebRequest to perform well when executed from Teamcity.
 
-
 function Write-Info($Message) {
     Write-Host "#### $Message ####" -ForegroundColor Yellow
 }
 
+Write-Info "Build parameters"
+Write-Host "Version = $Version"
+Write-Host "IsDefaultBranch = $IsDefaultBranch"
+Write-Host "BranchName = $BranchName"
+Write-Host "NugetFeedToPublishTo = $NugetFeedToPublishTo"
+Write-Host "NugetFeedApiKey = ##redacted##"
 
 Push-Location $PSScriptRoot
 try {
