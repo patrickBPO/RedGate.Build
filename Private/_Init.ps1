@@ -12,6 +12,7 @@ $NugetExe = Resolve-Path "$PSScriptRoot\nuget.exe"
 $DefaultNUnitVersion = '2.6.4'
 $DefaultDotCoverVersion = '3.2.0'
 $DefaultSmartAssemblyVersion = '6.8.0.248'
+$DefaultNodeJsPackageVersion = '6.0.0'
 
 
 if ($Host.Name -eq "Default Host") {
