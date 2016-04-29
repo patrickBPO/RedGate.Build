@@ -27,6 +27,9 @@ param(
   [bool] $IsDefaultBranch = $False,
 
   [Parameter(Mandatory = $False)]
+  [string] $BranchName,
+
+  [Parameter(Mandatory = $False)]
   [string] $NugetFeedToPublishTo,
 
   [Parameter(Mandatory = $False)]
@@ -49,10 +52,14 @@ try {
   Write-Info 'Importing TeamCity module'
   Import-Module '.\Private\teamcity.psm1' -DisableNameChecking -Force
 
-  if(!$IsDefaultBranch) {
-    # If we are not building from master, append '-prerelease' to the package version
-    $Version = "$Version-prerelease"
-    # let TC know
+  if(!$IsDefaultBranch -and $BranchName) {
+    # If we are not building from master, append a pre-release suffix to the package version.
+    $PackageSuffix = $BranchName -replace '[^a-zA-Z0-9\.\-_]', '' # Strip out any unwanted chars.
+    if ($PackageSuffix.Length -gt 20) {
+        $PackageSuffix = $PackageSuffix.Substring(0, 20)
+    }
+    $Version = "$Version-$PackageSuffix"
+    # And let TeamCity know we've changed the  version number.
     TeamCity-SetBuildNumber($Version)
   }
 
