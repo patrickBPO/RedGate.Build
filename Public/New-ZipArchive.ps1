@@ -49,8 +49,16 @@ function New-ZipArchive {
             if($BasePath) {
                 $destination = $_.Path -replace ([Regex]::Escape($BasePath)), $tempFolder
             }
-            # Make sure the destination parent folder exists...
-            New-Item (Split-Path $Destination) -ItemType Directory -Force | Out-Null
+            if ($destination)
+            {
+                # Make sure the destination parent folder exists...
+                New-Item (Split-Path $destination) -ItemType Directory -Force | Out-Null
+            }
+            else
+            {
+                # Or just copy to the root if there is no $BasePath
+                $destination = $tempFolder
+            }
             Copy-Item $_.Path -Destination $destination -Recurse -Force
         }
 
