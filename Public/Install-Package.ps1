@@ -14,7 +14,7 @@
         was installed to.
 #>
 #requires -Version 2
-function Install-Package 
+function Install-Package
 {
     [CmdletBinding()]
     param(
@@ -31,7 +31,7 @@ function Install-Package
         | Where-Object { $_.Name.StartsWith("$Name.$Version", 'InvariantCultureIgnoreCase') } `
         | Sort-Object -Descending { $_.Name }
         if ($ExistingPackageDirs.Length -gt 0) {
-            return $ExistingPackageDirs[0].FullName | Resolve-Path 
+            return $ExistingPackageDirs[0].FullName
         }
     }
 
@@ -48,5 +48,5 @@ function Install-Package
     if ($ExistingPackageDirs.Length -eq 0) {
         throw 'Failed to locate the folder of the newly installed package'
     }
-    return $ExistingPackageDirs[0].FullName | Resolve-Path 
+    return $ExistingPackageDirs[0].FullName
 }
