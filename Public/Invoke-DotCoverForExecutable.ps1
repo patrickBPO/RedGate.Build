@@ -30,7 +30,11 @@ function Invoke-DotCoverForExecutable {
     [string] $DotCoverVersion = $DefaultDotCoverVersion,
 
     [Parameter(Mandatory = $False)]
-    [string] $DotCoverFilters = ''
+    [Alias('DotCoverFilters')]
+    [string] $Filters = ''
+
+    [Parameter(Mandatory = $False)]
+    [string] $AttributeFilters = ''
   )
 
   $DotCoverArguments = @(
@@ -40,8 +44,12 @@ function Invoke-DotCoverForExecutable {
     '/ReturnTargetExitCode'
   )
 
-  if (![string]::IsNullOrWhiteSpace($DotCoverFilters)) {
-    $DotCoverArguments += "/Filters=$DotCoverFilters"
+  if (![string]::IsNullOrWhiteSpace($Filters)) {
+    $DotCoverArguments += "/Filters=$Filters"
+  }
+
+  if (![string]::IsNullOrWhiteSpace($AttributeFilters)) {
+    $DotCoverArguments += "/AttributeFilters=$AttributeFilters"
   }
 
   if ($TargetArguments) {
