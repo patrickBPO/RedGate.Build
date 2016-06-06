@@ -31,7 +31,7 @@ function Invoke-DotCoverForExecutable {
 
     [Parameter(Mandatory = $False)]
     [Alias('DotCoverFilters')]
-    [string] $Filters = ''
+    [string] $Filters = '',
 
     [Parameter(Mandatory = $False)]
     [string] $AttributeFilters = ''
