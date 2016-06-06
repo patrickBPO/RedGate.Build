@@ -11,8 +11,10 @@
   The output XML file containing the detailed coverage information.
 .PARAMETER DotCoverVersion
   The version of dotCover nuget package to use.
-.PARAMETER DotCoverFilters
+.PARAMETER Filters
   Coverage filters for dotCover, to indicate what should and should not be covered.
+.PARAMETER AttributeFilters
+  Attribute coverage filters for dotCover, to indicate what should and should not be covered.
 #>
 function Invoke-DotCoverForExecutable {
   [CmdletBinding()]
