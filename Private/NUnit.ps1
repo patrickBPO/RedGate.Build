@@ -45,11 +45,19 @@ function Get-NUnitConsoleExePath {
         #By default, use nunit-console.exe
         [switch] $x86
     )
-
-    $nunitExec = 'nunit-console.exe'
+	
+	$nunitBase = 'nunit'
+	if (!$NUnitVersion.StartsWith("2.")) {
+		# Version 3 puts the major version in front, let's assume that's a trend
+		$nunitBase += $NUnitVersion.Split(".")[0]
+	}
+	
+	$nunitConsole = '-console'
     if($x86.IsPresent) {
-        $nunitExec = 'nunit-console-x86.exe'
-    }
+        $nunitConsole += '-x86'
+    }	
+	
+    $nunitExec = $nunitBase + $nunitConsole + '.exe'
 
     Write-Verbose "Using NUnit version $NUnitVersion"
     $NUnitFolder = Install-NUnitPackage $NUnitVersion

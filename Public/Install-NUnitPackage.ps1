@@ -10,6 +10,10 @@ function Install-NUnitPackage {
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
     [string] $Version = $DefaultNUnitVersion
   )
-
-  Install-Package NUnit.Runners $Version
+ 
+  $packageName = "NUnit.Console" #Contains exe from 3.0 onwards
+  if ($Version.StartsWith("2.")) {
+    $packageName = "NUnit.Runners"
+  }
+  Install-Package $packageName $Version
 }
