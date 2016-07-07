@@ -11,6 +11,7 @@ function Build-NUnit3CommandLineArguments {
 
     $params = $AssemblyPath,
         "--result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
+        "--teamcity",
         "--noheader",
         "--labels=On",
         "--out=`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",

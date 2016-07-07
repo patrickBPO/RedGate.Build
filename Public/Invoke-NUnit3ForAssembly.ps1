@@ -41,10 +41,7 @@ function Invoke-NUnit3ForAssembly {
     # The dotcover filters passed to dotcover.exe
     [string] $DotCoverFilters = '',
     # The dotcover filters passed to dotcover.exe
-    [string] $DotCoverAttributeFilters = '',
-    # If set, do not import test results automatically to Teamcity.
-    # In this case it is the responsibility of the caller to call 'TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"'
-    [switch] $DotNotImportResultsToTeamcity
+    [string] $DotCoverAttributeFilters = ''
   )
 
   Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
@@ -89,7 +86,7 @@ function Invoke-NUnit3ForAssembly {
       Publish-ResultsAndLogsToTeamcity `
         -AssemblyPath $AssemblyPath `
         -TestResultFilenamePattern $TestResultFilenamePattern `
-        -ImportResultsToTeamcity (!$DotNotImportResultsToTeamcity.IsPresent)
+        -ImportResultsToTeamcity $false # Do not import results to Teamcity since we are already executing nunit with the --teamcity switch
   }
 
 }
