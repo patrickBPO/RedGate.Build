@@ -13,8 +13,8 @@ function Build-NUnit3CommandLineArguments {
         "--result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
         "--noheader",
         "--labels=On",
-        "--out:`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
-        "--err:`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
+        "--out=`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
+        "--err=`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
 
     if($x86) {
         $params += "--x86"
