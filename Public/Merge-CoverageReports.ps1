@@ -28,6 +28,10 @@ function Merge-CoverageReports {
       $CoverageOutputFolder = $SnapshotsDir
   }
 
+  if(!(Test-Path $CoverageOutputFolder)) {
+      New-Item $CoverageOutputFolder -ItemType Directory -Force | Out-Null
+  }
+
   $DotCoverPath = Get-DotCoverExePath
 
   $MergedSnapshotPath = "$CoverageOutputFolder\coverage.dcvr"
