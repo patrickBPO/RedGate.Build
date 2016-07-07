@@ -2,7 +2,7 @@
 
 $FullPathToModuleRoot = Resolve-Path $PSScriptRoot\..\..\..
 
-. "$FullPathToModuleRoot\Private\NUnit.ps1"
+. "$FullPathToModuleRoot\Private\NUnit\2\Get-NUnitConsoleExePath.ps1"
 
 Describe 'Get-NUnitConsoleExePath' {
 
