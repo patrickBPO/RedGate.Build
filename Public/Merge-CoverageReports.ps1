@@ -22,7 +22,8 @@ function Merge-CoverageReports {
   $DotCoverPath = Get-DotCoverExePath
 
   $MergedSnapshotPath = "$OutputDir\coverage.dcvr"
-  $snapshots = (Get-ChildItem $OutputDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent).FullName
+  # Use -ErrorAction SilentlyContinue to survive windows "path is too long" errors.
+  $snapshots = (Get-ChildItem $OutputDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent -ErrorAction SilentlyContinue).FullName
   Write-Verbose "Merging snapshots: `r`n$snapshots`r`n`r`nto $MergedSnapshotPath"
 
   & $DotCoverPath merge /Source="$($snapshots -join ';')" /Output="$MergedSnapshotPath"
