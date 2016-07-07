@@ -49,6 +49,10 @@ function Invoke-NUnit3ForAssembly {
 
   Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
 
+  if(!$NunitVersion.StartsWith('3.')) {
+      throw "Unexpected NUnit version '$NUnitVersion'. This function only supports Nunit v3"
+  }
+
   $AssemblyPath = Resolve-Path $AssemblyPath
 
   Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage)"
