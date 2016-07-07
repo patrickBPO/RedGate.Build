@@ -46,6 +46,10 @@ function Get-NUnitConsoleExePath {
         [switch] $x86
     )
 
+    if(!$NunitVersion.StartsWith('2.')) {
+        throw "Unexpected NUnit version '$NUnitVersion'. This function only supports Nunit v2"
+    }
+
     $nunitExec = 'nunit-console.exe'
     if($x86.IsPresent) {
         $nunitExec = 'nunit-console-x86.exe'
