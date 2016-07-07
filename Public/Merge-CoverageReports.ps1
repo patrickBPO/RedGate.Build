@@ -21,20 +21,20 @@ function Merge-CoverageReports {
 
     # The folder where the merged coverage report will be saved.
     # If not set, this will default to the value of -SnapshotsDir
-    [string] $CoverageOutputFolder
+    [string] $CoverageOutputDir
   )
 
-  if(!$CoverageOutputFolder) {
-      $CoverageOutputFolder = $SnapshotsDir
+  if(!$CoverageOutputDir) {
+      $CoverageOutputDir = $SnapshotsDir
   }
 
-  if(!(Test-Path $CoverageOutputFolder)) {
-      New-Item $CoverageOutputFolder -ItemType Directory -Force | Out-Null
+  if(!(Test-Path $CoverageOutputDir)) {
+      New-Item $CoverageOutputDir -ItemType Directory -Force | Out-Null
   }
 
   $DotCoverPath = Get-DotCoverExePath
 
-  $MergedSnapshotPath = "$CoverageOutputFolder\coverage.dcvr"
+  $MergedSnapshotPath = "$CoverageOutputDir\coverage.dcvr"
   # Use -ErrorAction SilentlyContinue to survive windows "path is too long" errors.
   $snapshots = (Get-ChildItem $SnapshotsDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent -ErrorAction SilentlyContinue).FullName
   Write-Verbose "Merging snapshots: `r`n$snapshots`r`n`r`nto $MergedSnapshotPath"
@@ -43,7 +43,7 @@ function Merge-CoverageReports {
 
   if( $env:TEAMCITY_VERSION -eq $null ) {
     # Create an HTML report if running outside of Teamcity to help with debugging
-    & $DotCoverPath report /Source="$MergedSnapshotPath" /Output="$CoverageOutputFolder\report.html" /reporttype=HTML
+    & $DotCoverPath report /Source="$MergedSnapshotPath" /Output="$CoverageOutputDir\report.html" /reporttype=HTML
   }
 
   # Let Teamcity know where the current dotcover.exe we are using is
