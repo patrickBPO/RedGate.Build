@@ -59,6 +59,7 @@ function Invoke-NUnitForAssembly {
 
     $NunitArguments = Build-NUnitCommandLineArguments `
       -AssemblyPath $AssemblyPath `
+      -NUnitVersion $NUnitVersion `
       -FrameworkVersion $FrameworkVersion `
       -ExcludedCategories $ExcludedCategories `
       -IncludedCategories $IncludedCategories `

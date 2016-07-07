@@ -3,33 +3,47 @@ function Build-NUnitCommandLineArguments {
     param(
         [Parameter(Mandatory=$true)]
         [string] $AssemblyPath,
+        [Parameter(Mandatory=$true)]
+        [string] $NUnitVersion,
         [string] $FrameworkVersion,
         [string[]] $ExcludedCategories = @(),
         [string[]] $IncludedCategories = @(),
         [string] $TestResultFilenamePattern = 'TestResult'
     )
 
+    if($NUnitVersion.StartsWith("2.")){
+        $paramPrefix = "/"
+    } else {
+        $paramPrefix = "--"
+    }
+
     $params = $AssemblyPath,
-        "/result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
-        '/nologo',
+        "$($paramPrefix)result=`"$AssemblyPath.$TestResultFilenamePattern.xml`"",
+        "$($paramPrefix)out=`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
+        "$($paramPrefix)err=`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
+
+    if($NUnitVersion.StartsWith("2.")) {
+        $params += '/nologo',
         '/nodots',
         '/noshadow',
-        '/labels',
-        "/out:`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
-        "/err:`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
+        '/labels'
+    } else {
+        $params += '--noheader',
+            '--labels=On'
+    }
 
     if($FrameworkVersion) {
-        $params += "/framework:$FrameworkVersion"
+        $params += "$($paramPrefix)framework=$FrameworkVersion"
     }
 
     #add the /exclude param if $ExcludedCategories is not empty:
     if($ExcludedCategories) {
-        $params += "/exclude:$($ExcludedCategories -join ';')"
+        $params += "$($paramPrefix)exclude=$($ExcludedCategories -join ';')"
     }
 
     #add the /include param if $IncludedCategories is not empty:
     if($IncludedCategories) {
-        $params += "/include:$($IncludedCategories -join ';')"
+        $params += "$($paramPrefix)include=$($IncludedCategories -join ';')"
     }
 
     return $params
@@ -45,18 +59,18 @@ function Get-NUnitConsoleExePath {
         #By default, use nunit-console.exe
         [switch] $x86
     )
-	
+
 	$nunitBase = 'nunit'
 	if (!$NUnitVersion.StartsWith("2.")) {
 		# Version 3 puts the major version in front, let's assume that's a trend
 		$nunitBase += $NUnitVersion.Split(".")[0]
 	}
-	
+
 	$nunitConsole = '-console'
     if($x86.IsPresent) {
         $nunitConsole += '-x86'
-    }	
-	
+    }
+
     $nunitExec = $nunitBase + $nunitConsole + '.exe'
 
     Write-Verbose "Using NUnit version $NUnitVersion"
