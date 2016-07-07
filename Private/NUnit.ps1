@@ -55,8 +55,10 @@ function Get-NUnitConsoleExePath {
         # The version of the nuget package containing the NUnit executables (NUnit.Runners)
         [string] $NUnitVersion = $DefaultNUnitVersion,
 
-        #If set, return path to nunit-console-x86.exe.
-        #By default, use nunit-console.exe
+        # If set, return path to nunit-console-x86.exe.
+        # By default, use nunit-console.exe.
+        # Note that this will not do anything if -NUnitVersion is 3+.
+        # That's because there is not nunit3-console-x86.exe. (instead nunit3-console.exe takes a --x86 parameter)
         [switch] $x86
     )
 
@@ -67,7 +69,7 @@ function Get-NUnitConsoleExePath {
 	}
 
 	$nunitConsole = '-console'
-    if($x86.IsPresent) {
+    if($x86.IsPresent -and $NUnitVersion.StartsWith("2.")) {
         $nunitConsole += '-x86'
     }
 
