@@ -5,13 +5,16 @@ function Build-NUnitCommandLineArguments {
         [string] $AssemblyPath,
         [Parameter(Mandatory=$true)]
         [string] $NUnitVersion,
+        [bool] $x86,
         [string] $FrameworkVersion,
         [string[]] $ExcludedCategories = @(),
         [string[]] $IncludedCategories = @(),
         [string] $TestResultFilenamePattern = 'TestResult'
     )
 
-    if($NUnitVersion.StartsWith("2.")){
+    $IsNunit2 = $NUnitVersion.StartsWith("2.")
+
+    if($IsNunit2){
         $paramPrefix = "/"
     } else {
         $paramPrefix = "--"
@@ -22,7 +25,7 @@ function Build-NUnitCommandLineArguments {
         "$($paramPrefix)out=`"$AssemblyPath.$TestResultFilenamePattern.TestOutput.txt`"",
         "$($paramPrefix)err=`"$AssemblyPath.$TestResultFilenamePattern.TestError.txt`""
 
-    if($NUnitVersion.StartsWith("2.")) {
+    if($IsNunit2) {
         $params += '/nologo',
         '/nodots',
         '/noshadow',
@@ -30,6 +33,11 @@ function Build-NUnitCommandLineArguments {
     } else {
         $params += '--noheader',
             '--labels=On'
+    }
+
+    if($x86 -and !$IsNunit2) {
+        #NUnit 3+ takes a --x86 parameter
+        $params += '--x86'
     }
 
     if($FrameworkVersion) {
