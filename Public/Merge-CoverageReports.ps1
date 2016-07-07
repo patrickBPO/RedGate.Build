@@ -13,27 +13,41 @@ function Merge-CoverageReports {
   param(
     # The folder containing the coverage reports to be merged.
     [Parameter(Mandatory=$true)]
-    [string] $OutputDir,
+    [Alias('OutputDir')]
+    [string] $SnapshotsDir,
 
     # Also find coverage reports in child folders.
-    [switch] $Recurse
+    [switch] $Recurse,
+
+    # The folder where the merged coverage report will be saved.
+    # If not set, this will default to the value of -SnapshotsDir
+    [string] $CoverageOutputDir
   )
+
+  if(!$CoverageOutputDir) {
+      $CoverageOutputDir = $SnapshotsDir
+  }
+
+  if(!(Test-Path $CoverageOutputDir)) {
+      New-Item $CoverageOutputDir -ItemType Directory -Force | Out-Null
+  }
 
   $DotCoverPath = Get-DotCoverExePath
 
-  $MergedSnapshotPath = "$OutputDir\coverage.dcvr"
-  $snapshots = (Get-ChildItem $OutputDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent).FullName
+  $MergedSnapshotPath = "$CoverageOutputDir\coverage.dcvr"
+  # Use -ErrorAction SilentlyContinue to survive windows "path is too long" errors.
+  $snapshots = (Get-ChildItem $SnapshotsDir -Filter *.coverage.snap -Recurse:$Recurse.IsPresent -ErrorAction SilentlyContinue).FullName
   Write-Verbose "Merging snapshots: `r`n$snapshots`r`n`r`nto $MergedSnapshotPath"
 
   & $DotCoverPath merge /Source="$($snapshots -join ';')" /Output="$MergedSnapshotPath"
 
   if( $env:TEAMCITY_VERSION -eq $null ) {
     # Create an HTML report if running outside of Teamcity to help with debugging
-    & $DotCoverPath report /Source="$MergedSnapshotPath" /Output="$OutputDir\report.html" /reporttype=HTML
-  } else {
-    # Let Teamcity know where the current dotcover.exe we are using is
-    TeamCity-ConfigureDotNetCoverage -key 'dotcover_home' -value ($DotCoverPath | Split-Path)
-    # Let Teamcity know where the report is.
-    TeamCity-ImportDotNetCoverageResult 'dotcover' $MergedSnapshotPath
+    & $DotCoverPath report /Source="$MergedSnapshotPath" /Output="$CoverageOutputDir\report.html" /reporttype=HTML
   }
+
+  # Let Teamcity know where the current dotcover.exe we are using is
+  TeamCity-ConfigureDotNetCoverage -key 'dotcover_home' -value ($DotCoverPath | Split-Path)
+  # Let Teamcity know where the report is.
+  TeamCity-ImportDotNetCoverageResult 'dotcover' $MergedSnapshotPath
 }
