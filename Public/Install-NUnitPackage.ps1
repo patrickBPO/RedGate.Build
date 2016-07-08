@@ -11,7 +11,11 @@ function Install-NUnitPackage {
     [string] $Version = $DefaultNUnitVersion
   )
  
-  $packageName = "NUnit.Console" #Contains exe from 3.0 onwards
+  $packageName = "NUnit.ConsoleRunner" #Contains exe from 3.2 onwards
+  
+  if ($Version.StartsWith("3.0") -or $Version.StartsWith("3.1")) {
+    $packageName = "NUnit.Console"
+  }
   if ($Version.StartsWith("2.")) {
     $packageName = "NUnit.Runners"
   }
