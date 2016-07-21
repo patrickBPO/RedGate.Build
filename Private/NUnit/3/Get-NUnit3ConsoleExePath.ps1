@@ -12,5 +12,11 @@ function Get-NUnit3ConsoleExePath {
     Write-Verbose "Using NUnit version $NUnitVersion"
     $NUnitFolder = Install-NUnitPackage $NUnitVersion
 
-    "$NUnitFolder\tools\nunit3-console.exe" | Resolve-Path
+    $nunit3ActualPackageName = "NUnit.ConsoleRunner"
+    if ($NUnitVersion.StartsWith("3.0") -or $NUnitVersion.StartsWith("3.1")) {
+      $nunit3ActualPackageName = "NUnit.Console"
+    }
+
+    # The nunit 3 console runner is actually in NUnit.ConsoleRunner.*
+    "$NUnitFolder\..\$nunit3ActualPackageName.$NUnitVersion\tools\nunit3-console.exe" | Resolve-Path
 }
