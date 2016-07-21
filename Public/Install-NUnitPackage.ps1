@@ -10,6 +10,5 @@ function Install-NUnitPackage {
     # The version of the nuget package containing the NUnit executables (NUnit.Runners)
     [string] $Version = $DefaultNUnitVersion
   )
-
-  Install-Package NUnit.Runners $Version
+  Install-Package "NUnit.Runners" $Version
 }

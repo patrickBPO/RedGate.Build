@@ -51,6 +51,14 @@ function Invoke-NUnitForAssembly {
 
   Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
 
+  if($NunitVersion.StartsWith('3.')) {
+      throw "NUnit version '$NUnitVersion' is not supported by this function. Use Invoke-NUnit3ForAssembly instead."
+  }
+
+  if(!$NunitVersion.StartsWith('2.')) {
+      throw "Unexpected NUnit version '$NUnitVersion'. This function only supports Nunit v2"
+  }
+
   $AssemblyPath = Resolve-Path $AssemblyPath
 
   Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage)"
@@ -85,16 +93,10 @@ function Invoke-NUnitForAssembly {
     }
 
   } finally {
-    if(-not $DotNotImportResultsToTeamcity.IsPresent) {
-      TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"
-    }
-
-    # Tell teamcity to keep our test output logs as well. This could come in handy
-    $assemblyFilename = Split-Path $AssemblyPath -Leaf
-    # $AssemblyPath.$TestResultFilenamePattern.*x* ? That's a horrible way to only get the .xml and .txt file in 1 line.
-    # (and skip the *.coverage.snap file if any)
-    # Teamcity doesn't seem to let you add files to an existing zipped file.... oh well...
-    TeamCity-PublishArtifact "$AssemblyPath.$TestResultFilenamePattern.*x* => logs/tests/$assemblyFilename.$TestResultFilenamePattern/logs.zip"
+      Publish-ResultsAndLogsToTeamcity `
+        -AssemblyPath $AssemblyPath `
+        -TestResultFilenamePattern $TestResultFilenamePattern `
+        -ImportResultsToTeamcity (!$DotNotImportResultsToTeamcity.IsPresent)
   }
 
 }
