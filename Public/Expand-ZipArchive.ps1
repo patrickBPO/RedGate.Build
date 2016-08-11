@@ -2,8 +2,7 @@
 .SYNOPSIS
   Unzip a .zip archive to a directory
 .DESCRIPTION
-  Uses 7zip to extract a zip file containing files matching
-  filename patterns passed in as $Files
+  Extracts a zip file to the specified destination directory
 .EXAMPLE
   Expand-ZipArchive -Archive .\Build\MyZip.zip -Destination .\Build\MyZip
 
