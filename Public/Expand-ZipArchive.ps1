@@ -23,11 +23,9 @@ function Expand-ZipArchive {
       [string] $Destination
   )
 
-  try {
-    Get-Command Expand-Archive | Out-Null
-
+  if((Get-Command Expand-Archive -ErrorAction 0)) {
     Expand-Archive $Archive $Destination
-  } catch {
+  } else {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory($Archive, $Destination)
   }
