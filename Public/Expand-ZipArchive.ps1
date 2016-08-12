@@ -23,7 +23,7 @@ function Expand-ZipArchive {
       [string] $Destination
   )
 
-  if((Get-Command Expand-Archive -ErrorAction 0)) {
+  if(Get-Command Expand-Archive -ErrorAction 0) {
     Expand-Archive $Archive $Destination
   } else {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
