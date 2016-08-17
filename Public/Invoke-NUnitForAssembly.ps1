@@ -12,6 +12,7 @@
   Invoke-NUnitForAssembly -AssemblyPath .\bin\debug\test.dll -EnableCodeCoverage $true
     Execute the NUnit tests from test.dll and wrap nunit-console.exe with dotcover.exe to provide code coverage.
     Code coverage report will be saved as .\bin\debug\test.dll.coverage.snap
+    Use the Merge-CoverageReports function in order to publish coverage stats to Teamcity
 .NOTES
   See also: Merge-CoverageReports
 #>
