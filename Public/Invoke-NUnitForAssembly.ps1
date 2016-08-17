@@ -9,7 +9,7 @@
     Execute the NUnit tests from test.dll using nunit 2.6.2 (nuget package will be installed if need be.).
     And pass '/include:working' to nunit-console.exe
 .EXAMPLE
-  Invoke-NUnitForAssembly -AssemblyPath .\bin\debug\test.dll -EnableCodeCoverage
+  Invoke-NUnitForAssembly -AssemblyPath .\bin\debug\test.dll -EnableCodeCoverage $true
     Execute the NUnit tests from test.dll and wrap nunit-console.exe with dotcover.exe to provide code coverage.
     Code coverage report will be saved as .\bin\debug\test.dll.coverage.snap
 .NOTES
@@ -37,7 +37,7 @@ function Invoke-NUnitForAssembly {
     # the test result filename would be 'MyAssembly.Test.dll.TestResult.xml'
     [string] $TestResultFilenamePattern = 'TestResult',
     # If set, enable code coverage using dotcover
-    [switch] $EnableCodeCoverage,
+    [bool] $EnableCodeCoverage,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
     [string] $DotCoverVersion = $DefaultDotCoverVersion,
     # The dotcover filters passed to dotcover.exe
