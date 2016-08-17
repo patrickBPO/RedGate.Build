@@ -35,7 +35,7 @@ function Invoke-NUnit3ForAssembly {
     # the test result filename would be 'MyAssembly.Test.dll.TestResult.xml'
     [string] $TestResultFilenamePattern = 'TestResult',
     # If set, enable code coverage using dotcover
-    [bool] $EnableCodeCoverage = $false,
+    [switch] $EnableCodeCoverage,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
     [string] $DotCoverVersion = $DefaultDotCoverVersion,
     # The dotcover filters passed to dotcover.exe
@@ -52,7 +52,7 @@ function Invoke-NUnit3ForAssembly {
 
   $AssemblyPath = Resolve-Path $AssemblyPath
 
-  Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage)"
+  Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage.IsPresent)"
 
   try {
 
@@ -64,7 +64,7 @@ function Invoke-NUnit3ForAssembly {
 
     $NunitExecutable = Get-NUnit3ConsoleExePath -NUnitVersion $NUnitVersion
 
-    if( $EnableCodeCoverage ) {
+    if( $EnableCodeCoverage.IsPresent ) {
 
       Invoke-DotCoverForExecutable `
         -TargetExecutable $NunitExecutable `
