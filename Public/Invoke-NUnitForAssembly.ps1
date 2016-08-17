@@ -61,7 +61,7 @@ function Invoke-NUnitForAssembly {
 
   $AssemblyPath = Resolve-Path $AssemblyPath
 
-  Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage.IsPresent)"
+  Write-Output "Executing tests from $AssemblyPath. (code coverage enabled: $EnableCodeCoverage)"
 
   try {
 
@@ -74,7 +74,7 @@ function Invoke-NUnitForAssembly {
 
     $NunitExecutable = Get-NUnitConsoleExePath -NUnitVersion $NUnitVersion -x86:$x86.IsPresent
 
-    if( $EnableCodeCoverage.IsPresent ) {
+    if( $EnableCodeCoverage ) {
 
       Invoke-DotCoverForExecutable `
         -TargetExecutable $NunitExecutable `
