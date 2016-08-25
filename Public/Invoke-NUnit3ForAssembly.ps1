@@ -8,9 +8,10 @@
   Invoke-NUnit3ForAssembly -AssemblyPath .\bin\debug\test.dll -NUnitVersion '3.0.0'
     Execute the NUnit tests from test.dll using nunit 3.0.0 (nuget package will be installed if need be.).
 .EXAMPLE
-  Invoke-NUnit3ForAssembly -AssemblyPath .\bin\debug\test.dll -NUnitVersion '3.0.0' -EnableCodeCoverage
+  Invoke-NUnit3ForAssembly -AssemblyPath .\bin\debug\test.dll -NUnitVersion '3.0.0' -EnableCodeCoverage $true
     Execute the NUnit tests from test.dll and wrap nunit3-console.exe with dotcover.exe to provide code coverage.
     Code coverage report will be saved as .\bin\debug\test.dll.coverage.snap
+    Use the Merge-CoverageReports function in order to publish coverage stats to Teamcity
 .NOTES
   See also: Merge-CoverageReports
 #>
@@ -34,7 +35,7 @@ function Invoke-NUnit3ForAssembly {
     # For MyAssembly.Test.dll, if TestResultFilenamePattern is 'TestResult',
     # the test result filename would be 'MyAssembly.Test.dll.TestResult.xml'
     [string] $TestResultFilenamePattern = 'TestResult',
-    # If set, enable code coverage using dotcover
+    # Set to $true to enable code coverage using dotcover
     [bool] $EnableCodeCoverage = $false,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
     [string] $DotCoverVersion = $DefaultDotCoverVersion,
