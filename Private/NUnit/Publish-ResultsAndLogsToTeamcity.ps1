@@ -3,9 +3,7 @@ function Publish-ResultsAndLogsToTeamcity {
     param(
         [Parameter(Mandatory=$true)]
         [String] $AssemblyPath,
-        [Parameter(Mandatory=$true)]
-        [String] $TestResultFilenamePattern,
-
+        [String] $TestResultFilenamePattern = 'TestResult',
         [bool] $ImportResultsToTeamcity
     )
 
