@@ -8,8 +8,11 @@
   Header = '^#+\s*(?<header>.+):?$'
   
   eg
-  # 1.2.3.4
-  ### Released on 2016-08-01
+  # Stuff here before the first version
+  Is ignored.
+  
+  ## 1.2.3.4
+  ##### Released on 2016-08-01
   This text goes into .Blocks.General
   ### Fixes
   FIX-01: This text goes into .Blocks.Fixes
@@ -18,6 +21,7 @@
   
   (Alternative date reading from SQL Compare markdown)
   # 1.2.3 - August 1st 2016
+  # 1.2 - March 3rd, 2016
 .EXAMPLE
   Select-ReleaseNotes -ReleaseNotesPath SQLCompareUIs\COMPARE_RELEASENOTES.md
   
@@ -55,10 +59,19 @@ function Select-ReleaseNotes {
     [CmdletBinding()]
     param(
         # The path of the RELEASENOTES.md file to read from
-        [Parameter(Mandatory=$true)]
-        [string] $ReleaseNotesPath
+        [string] $ReleaseNotesPath,
+        # The RELEASENOTES markdown to select from
+        [string] $ReleaseNotes
     )
-    $Lines = Get-Content $ReleaseNotesPath
+    if ($ReleaseNotesPath) {
+        $Lines = Get-Content $ReleaseNotesPath
+    } elseif ($ReleaseNotes) {
+        # Makes testing easier
+        $Lines = ($ReleaseNotes -Replace "'r").Split("`n")
+    } else {
+        throw 'No $ReleaseNotesPath or $ReleaseNotes specified'
+    }
+    
     $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
     $HeaderRegex = '^#+\s*(?<header>.+):?$'
     $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
@@ -74,7 +87,6 @@ function Select-ReleaseNotes {
     $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
     $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
 
-    
     $Lines | ForEach-Object {
         $Line = $_.Trim()
         $VersionMatch = [regex]::Match($Line, $VersionRegex)
