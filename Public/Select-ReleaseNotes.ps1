@@ -6,11 +6,11 @@
   Version+Date = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
   Date = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
   Header = '^#+\s*(?<header>.+):?$'
-  
+
   eg
   # Stuff here before the first version
   Is ignored.
-  
+
   ## 1.2.3.4
   ##### Released on 2016-08-01
   This text goes into .Blocks.General
@@ -18,13 +18,13 @@
   FIX-01: This text goes into .Blocks.Fixes
   ### Internal:
   Don't show this to customers, it's in .Blocks.Internal
-  
+
   (Alternative date reading from SQL Compare markdown)
   # 1.2.3 - August 1st 2016
   # 1.2 - March 3rd, 2016
 .EXAMPLE
   Select-ReleaseNotes -ReleaseNotesPath SQLCompareUIs\COMPARE_RELEASENOTES.md
-  
+
   Version      Date                Blocks
   -------      ----                ------
   12.0.25.3064 13/09/2016 00:00:00 {General}
@@ -73,7 +73,7 @@ function Select-ReleaseNotes {
     } else {
         throw 'No $ReleaseNotesPath or $ReleaseNotes specified'
     }
-    
+
     # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
     # Set up the default display set and create the member set object for use later on
     # Configure a default display set
@@ -85,8 +85,7 @@ function Select-ReleaseNotes {
 
     $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
     $HeaderRegex = '^#+\s*(?<header>.+):?$'
-    $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'    
-    
+    $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
 
     $Release = $nul
     $IgnoreRest = $false
@@ -106,7 +105,7 @@ function Select-ReleaseNotes {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
                 $Release
-                
+
                 # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
                 if ($Latest) {
                     $IgnoreRest = $true
@@ -114,7 +113,7 @@ function Select-ReleaseNotes {
                     return
                 }
             }
-            
+
             # Default Release object is created here with nice properties when in a list
             $CurrentHeader = 'General'
             $Release = [pscustomobject]@{
