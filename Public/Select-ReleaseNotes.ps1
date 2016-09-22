@@ -74,12 +74,6 @@ function Select-ReleaseNotes {
         throw 'No $ReleaseNotesPath or $ReleaseNotes specified'
     }
     
-    $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
-    $HeaderRegex = '^#+\s*(?<header>.+):?$'
-    $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
-    
-    $Release = $nul
-    
     # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
     # Set up the default display set and create the member set object for use later on
     # Configure a default display set
@@ -89,20 +83,31 @@ function Select-ReleaseNotes {
     $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
     $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
 
+    $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
+    $HeaderRegex = '^#+\s*(?<header>.+):?$'
+    $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'    
+    
+
+    $Release = $nul
     $IgnoreRest = $false
+
     $Lines | ForEach-Object {
         if ($IgnoreRest)
         {
+            # I seem to have to keep processing
             return
         }
         $Line = $_.Trim()
         $VersionMatch = [regex]::Match($Line, $VersionRegex)
         if ($VersionMatch.Success) {
+            # If a $Release already was being filled in - clean it up and return it
             if ($Release) {
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
                 $Release
+                
+                # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
                 if ($Latest) {
                     $IgnoreRest = $true
                     $Release = $nul
@@ -110,6 +115,7 @@ function Select-ReleaseNotes {
                 }
             }
             
+            # Default Release object is created here with nice properties when in a list
             $CurrentHeader = 'General'
             $Release = [pscustomobject]@{
                 Version = [version] $VersionMatch.Groups['version'].Value
@@ -119,22 +125,27 @@ function Select-ReleaseNotes {
             $Release.PSObject.TypeNames.Insert(0,'RedGate.Build.VersionInformation')
             $Release | Add-Member MemberSet PSStandardMembers $PSStandardMembers
 
+            # Add the SQL Compare style date to the object if found
             if ($VersionMatch.Groups['date'].Success) {
                 $simpleDate = $VersionMatch.Groups['date'].Value
                 $simpleDate = $simpleDate -replace '(\d+)(st|nd|rd|th)', '$1' -replace ','
                 $Release.Date = [DateTime] $simpleDate
             }
         } elseif ($Release) {
+            # Only start populating things once we've seen a version and initialised a $Release
             $DateMatch = [regex]::Match($Line, $DateRegex)
             $HeaderMatch = [regex]::Match($Line, $HeaderRegex)
             if ($DateMatch.Success) {
+                # Date take precedence over header
                 $Release.Date = [DateTime] $DateMatch.Groups['date'].Value
             } elseif ($HeaderMatch.Success) {
+                # New header, remove any trailing blank lines and prepare to add to new block
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
                 $CurrentHeader = $HeaderMatch.Groups['header'].Value
             } else {
+                # Any non date/header line is added to the current block as defined by $CurrentHeader
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader += [System.Environment]::NewLine + $Line
                 } else {
@@ -143,6 +154,7 @@ function Select-ReleaseNotes {
             }
         }
     }
+    # Clean up and return the last $Release object being populated (if there is one)
     if ($Release) {
         if ($Release.Blocks.$CurrentHeader) {
             $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
