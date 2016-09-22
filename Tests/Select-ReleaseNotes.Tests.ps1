@@ -121,4 +121,33 @@ Cool feature
             $vs[2].Blocks.Fixes | Should Be $nul
         }
     }
+    
+    InModuleScope RedGate.Build {
+        Context 'Latest Multiple Versions' {
+            $v = Select-ReleaseNotes -Latest -ReleaseNotes @"
+# SQL Dependency Tracker Release Notes
+## 2.8.9
+### Features
+* Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.
+
+### Fixes
+* Latest UI components, fixes initial window position, layout issues and a rare crash
+
+## 2.8.8.523
+###### Released on 2016-08-11
+### Fixes
+* Updated feature usage reporting library
+* Latest UI components, uses a more legible font on the menu
+* Old activations of SQL Dependency Tracker now work as expected
+
+## 2.8.7.512
+###### Failed release on 2016-08-01
+"@
+            $v.Version | Should Be '2.8.9'
+            $v.Date | Should Be $nul
+            $v.Blocks.General | Should Be $nul
+            $v.Blocks.Features | Should Be '* Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.'
+            $v.Blocks.Fixes | Should Be '* Latest UI components, fixes initial window position, layout issues and a rare crash'
+        }
+    }
 }

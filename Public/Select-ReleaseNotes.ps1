@@ -61,7 +61,9 @@ function Select-ReleaseNotes {
         # The path of the RELEASENOTES.md file to read from
         [string] $ReleaseNotesPath,
         # The RELEASENOTES markdown to select from
-        [string] $ReleaseNotes
+        [string] $ReleaseNotes,
+        # Only return the top version block in the file
+        [switch] $Latest
     )
     if ($ReleaseNotesPath) {
         $Lines = Get-Content $ReleaseNotesPath
@@ -87,7 +89,12 @@ function Select-ReleaseNotes {
     $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
     $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
 
+    $IgnoreRest = $false
     $Lines | ForEach-Object {
+        if ($IgnoreRest)
+        {
+            return
+        }
         $Line = $_.Trim()
         $VersionMatch = [regex]::Match($Line, $VersionRegex)
         if ($VersionMatch.Success) {
@@ -96,6 +103,11 @@ function Select-ReleaseNotes {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
                 $Release
+                if ($Latest) {
+                    $IgnoreRest = $true
+                    $Release = $nul
+                    return
+                }
             }
             
             $CurrentHeader = 'General'
