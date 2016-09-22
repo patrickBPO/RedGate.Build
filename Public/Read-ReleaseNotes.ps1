@@ -6,13 +6,13 @@
   2. That line and all subsequent lines are appended
   3. Return object contains Content and Version properties for retrieved information
 .EXAMPLE
-  Get-ReleaseNotes -ReleaseNotesPath $RootDir\RELEASENOTES.md
+  Read-ReleaseNotes -ReleaseNotesPath $RootDir\RELEASENOTES.md
     Returns two part version number and release notes.
 .EXAMPLE
-  Get-ReleaseNotes -ReleaseNotesPath $RootDir\RELEASENOTES.md -ThreePartVersion
+  Read-ReleaseNotes -ReleaseNotesPath $RootDir\RELEASENOTES.md -ThreePartVersion
     Returns thee part version number and release notes.
 #>
-function Get-ReleaseNotes {
+function Read-ReleaseNotes {
     [CmdletBinding()]
     param(
         # The path of the release notes.md file to read from
