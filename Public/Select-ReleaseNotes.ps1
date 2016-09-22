@@ -1,3 +1,22 @@
+function script:AddFeature($accumulator, [int] $priority, [string] $feature){
+    if ($accumulator.([string]$priority) -ne $nul -and $accumulator.([string]$priority) -ne $feature)
+    {
+        throw "Duplicate feature at priority $priority, was $($accumulator.([string]$priority)), attempting to set to $feature"
+    }
+    # TODO if the same feature exists at a lower priority - raise the priority for the given priority
+    $accumulator.([string]$priority) = $feature
+}
+
+function script:GetSummary($release, $accumulator)
+{
+    $summary = $accumulator.GetEnumerator() | sort {[int]$_.Key} -Descending
+    if ($summary) {
+        return [string]::Join(", ", $summary.Value)
+    } else {
+        return $release.Version
+    }
+}
+
 <#
 .SYNOPSIS
   Retrieves version information and release notes from a RELEASENOTES.md file
@@ -77,16 +96,20 @@ function Select-ReleaseNotes {
     # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
     # Set up the default display set and create the member set object for use later on
     # Configure a default display set
-    $defaultDisplaySet = 'Version','Date','Blocks'
+    $defaultDisplaySet = 'Version', 'Date', 'Blocks', 'Summary'
 
     # Create the default property display set
     $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
     $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
 
-    $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
-    $HeaderRegex = '^#+\s*(?<header>.+):?$'
+    $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?\s*$'
+    $HeaderRegex = '^#+\s*(?<header>.+):?\s*$'
     $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
+    $StraplineStartRegex = '^#+\s*Strapline\s*$'
+    $StraplineRegex = '^\s*(?<priority>[0-9]+)\.?\s*(?<feature>.*)\s*$'
 
+    $Accumulator = @{}
+    $StraplineAccumulator = $false
     $Release = $nul
     $IgnoreRest = $false
 
@@ -104,6 +127,7 @@ function Select-ReleaseNotes {
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
+                $Release.Summary = GetSummary -Release $Release -Accumulator $Accumulator
                 $Release
 
                 # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
@@ -113,12 +137,16 @@ function Select-ReleaseNotes {
                     return
                 }
             }
+            
+            
 
             # Default Release object is created here with nice properties when in a list
             $CurrentHeader = 'General'
+            $StraplineAccumulator = $false
             $Release = [pscustomobject]@{
                 Version = [version] $VersionMatch.Groups['version'].Value
                 Date = $nul
+                Summary = $nul
                 Blocks = @{}
             }
             $Release.PSObject.TypeNames.Insert(0,'RedGate.Build.VersionInformation')
@@ -133,22 +161,41 @@ function Select-ReleaseNotes {
         } elseif ($Release) {
             # Only start populating things once we've seen a version and initialised a $Release
             $DateMatch = [regex]::Match($Line, $DateRegex)
+            $StraplineStartMatch = [regex]::Match($Line, $StraplineStartRegex)
             $HeaderMatch = [regex]::Match($Line, $HeaderRegex)
             if ($DateMatch.Success) {
                 # Date take precedence over header
+                $StraplineAccumulator = $false
                 $Release.Date = [DateTime] $DateMatch.Groups['date'].Value
+            } elseif ($StraplineStartMatch.Success) {
+                # Start the strapline accumulator
+                $StraplineAccumulator = $true
             } elseif ($HeaderMatch.Success) {
                 # New header, remove any trailing blank lines and prepare to add to new block
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
+                $StraplineAccumulator = $false
                 $CurrentHeader = $HeaderMatch.Groups['header'].Value
             } else {
-                # Any non date/header line is added to the current block as defined by $CurrentHeader
-                if ($Release.Blocks.$CurrentHeader) {
-                    $Release.Blocks.$CurrentHeader += [System.Environment]::NewLine + $Line
+                if ($StraplineAccumulator) {
+                    # Ignore newlines in Strapline section
+                    if ($Line) {
+                        $StraplineMatch = [regex]::Match($Line, $StraplineRegex)
+                        if (!$StraplineMatch.Success) {
+                            throw "Strapline expected, encountered '$Line'"
+                        }
+                        AddFeature -accumulator $Accumulator `
+                            -priority $StraplineMatch.Groups['priority'].Value `
+                            -feature $StraplineMatch.Groups['feature'].Value
+                    }
                 } else {
-                    $Release.Blocks.$CurrentHeader = $Line
+                    # Any non date/header line is added to the current block as defined by $CurrentHeader
+                    if ($Release.Blocks.$CurrentHeader) {
+                        $Release.Blocks.$CurrentHeader += [System.Environment]::NewLine + $Line
+                    } else {
+                        $Release.Blocks.$CurrentHeader = $Line
+                    }
                 }
             }
         }
@@ -158,6 +205,7 @@ function Select-ReleaseNotes {
         if ($Release.Blocks.$CurrentHeader) {
             $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
         }
+        $Release.Summary = GetSummary -Release $Release -Accumulator $Accumulator
         $Release
     }
 }

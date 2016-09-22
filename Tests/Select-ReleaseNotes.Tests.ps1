@@ -23,7 +23,7 @@ Describe 'Read-ReleaseNotes' {
 
     InModuleScope RedGate.Build {
         Context 'Four Part Version' {
-            Mock Get-Content { '### 1.2.3.4' }
+            Mock Get-Content { '### 1.2.3.4   ' }
             $v = Select-ReleaseNotes -ReleaseNotesPath 'DoesNotExist\RELEASENOTES.md'
             $v.Version | Should Be '1.2.3.4'
             $v.Date | Should Be $nul
