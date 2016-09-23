@@ -1,32 +1,43 @@
 function script:AddFeature($accumulator, [int] $priority, [string] $feature){
-    if ($accumulator.([string]$priority) -ne $nul -and $accumulator.([string]$priority) -ne $feature)
+    $key = "{0:0000000}" -f $priority
+    if ($accumulator.$key -ne $nul -and $accumulator.($key) -ne $feature)
     {
-        throw "Duplicate feature at priority $priority, was $($accumulator.([string]$priority)), attempting to set to $feature"
+        # Uniqueify (in a consistent way) if the same priority is used
+        $key = "{0:0000000}-$feature" -f $priority
     }
     # TODO if the same feature exists at a lower priority - raise the priority for the given priority
-    $accumulator.([string]$priority) = $feature
+    $accumulator.($key) = $feature
 }
 
-function script:GetSummary($release, $accumulator)
-{
-    $summary = $accumulator.GetEnumerator() | sort {[int]$_.Key} -Descending
+function script:GetSummary($productName, $release, $accumulator)
+{    
+    $summary = $accumulator.GetEnumerator() | sort {$_.Key} -Descending
     if ($summary) {
         return [string]::Join(", ", $summary.Value)
+    } elseif ($productName) {
+        if ($release.Version.Revision -ne -1) {
+            return "$productName $($release.Version.ToString(3))"
+        } else {
+            return "$productName $($release.Version)"
+        }
     } else {
-        return $release.Version
+        throw "Unable to generate summary, no -ProductName and no use of # Strapline blocks."
     }
 }
 
 <#
 .SYNOPSIS
-  Retrieves version information and release notes from a RELEASENOTES.md file
+  Retrieves version information and release notes from a RELEASENOTES.md file or string
 .DESCRIPTION
   Creates objects for each version block located in the file as defined by...
   Version+Date = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?$'
   Date = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
   Header = '^#+\s*(?<header>.+):?$'
+  StraplineBlock = '^#+\s*Strapline\s*$'
+  Strapline = '^\s*(?<priority>[0-9]+)\.?\s*(?<feature>.*)\s*$'
 
-  eg
+  Example input
+  -------------
   # Stuff here before the first version
   Is ignored.
 
@@ -39,40 +50,79 @@ function script:GetSummary($release, $accumulator)
   Don't show this to customers, it's in .Blocks.Internal
 
   (Alternative date reading from SQL Compare markdown)
+  ----------------------------------------------------
   # 1.2.3 - August 1st 2016
   # 1.2 - March 3rd, 2016
-.EXAMPLE
-  Select-ReleaseNotes -ReleaseNotesPath SQLCompareUIs\COMPARE_RELEASENOTES.md
+  
+  For strapline
+  -------------
+  ## 2.8.6.499
+  ###### Released on 2016-07-12
+  ### Strapline
+  65. Updated SQL Compare Engine
+  50. Login licensing
+  50. New feature usage reporting
+  
+  ### Features
+  * New login based licensing: see https://www.red-gate.com/user-licensing for more details
+  * New feature usage reporting. Opt in/out from Help > Help us improve our products...
+  * SQL Dependency Tracker can now generate log files
+  * Logging configuration menu added to Help menu
+  * Updated SQL Compare engine
+  
+  ## 2.8.5.530
+  ###### Released on 2016-04-26
+  ### Strapline
+  90. SSMS 2016
+  
+  ### Features
+  * Support for SSMS March 2016 Preview Refresh (VS2015 shell)
+  * Updated product switcher and Redgate logo
+  * Updated SQL Compare engine
 
-  Version      Date                Blocks
-  -------      ----                ------
-  12.0.25.3064 13/09/2016 00:00:00 {General}
-  12.0.24.3012 25/08/2016 00:00:00 {Fixes, General}
-  12.0.23.2976 25/08/2016 00:00:00 {Fixes, General}
-  12.0.22.2910 22/08/2016 00:00:00 {Fixes, General}
-  12.0.21.2819 16/08/2016 00:00:00 {Fixes}
-  12.0.20.2791 11/08/2016 00:00:00 {Fixes}
-  12.0.19.2758 09/08/2016 00:00:00 {Fixes}
-  12.0.18.2723 05/08/2016 00:00:00 {Fixes}
-  12.0.17.2708 04/08/2016 00:00:00 {Fixes}
-  12.0.16.2688 03/08/2016 00:00:00 {Fixes}
-  12.0.15.2659 02/08/2016 00:00:00 {Fixes}
-  12.0.14.2614 28/07/2016 00:00:00 {Features, Fixes}
 .EXAMPLE
-  Select-ReleaseNotes SQLSourceControl\RELEASENOTES.md
+  Select-ReleaseNotes -ProductName "SQL Compare" -ReleaseNotesPath ..\SQLCompareUIs\COMPARE_RELEASENOTES.md
 
-  Version    Date                Blocks
-  -------    ----                ------
-  5.1.5                          {General}
-  5.1.4      08/07/2016 00:00:00 {Fixes, General}
-  5.1.3      06/07/2016 00:00:00 {Fixes, General}
-  5.1.2      29/06/2016 00:00:00 {Fixes, Features, General}
-  5.1.1      08/06/2016 00:00:00 {Fixes, General}
-  5.1.0      27/05/2016 00:00:00 {Fixes, General}
-  5.0.1      25/05/2016 00:00:00 {Fixes, General}
-  5.0.0      23/05/2016 00:00:00 {Major features, Fixes}
-  4.5.0      10/05/2016 00:00:00 {SQL Source Control 5 Beta, General}
-  4.4.2      03/05/2016 00:00:00 {Fixes, SQL Source Control 5 Beta, General}
+  Version      Date                Blocks                          Summary
+  -------      ----                ------                          -------
+  12.0.25.3064 13/09/2016 00:00:00 {General}                       SQL Compare 12.0.25
+  12.0.24.3012 25/08/2016 00:00:00 {Fixes, General}                SQL Compare 12.0.24
+  12.0.23.2976 25/08/2016 00:00:00 {Fixes, General}                SQL Compare 12.0.23
+  12.0.22.2910 22/08/2016 00:00:00 {Fixes, General}                SQL Compare 12.0.22
+  12.0.21.2819 16/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.21
+  12.0.20.2791 11/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.20
+  12.0.19.2758 09/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.19
+  12.0.18.2723 05/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.18
+  12.0.17.2708 04/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.17
+  12.0.16.2688 03/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.16
+  12.0.15.2659 02/08/2016 00:00:00 {Fixes}                         SQL Compare 12.0.15
+  12.0.14.2614 28/07/2016 00:00:00 {Features, Fixes}               SQL Compare 12.0.14
+  12.0.12.2546 22/07/2016 00:00:00 {Fixes}                         SQL Compare 12.0.12
+  12.0.10.2453 15/07/2016 00:00:00 {Fixes}                         SQL Compare 12.0.10
+  12.0.9.2436  14/07/2016 00:00:00 {Fixes}                         SQL Compare 12.0.9
+  12.0.8.2363  12/07/2016 00:00:00 {Features, Fixes}               SQL Compare 12.0.8
+  12.0.7.2257  30/06/2016 00:00:00 {Fixes}                         SQL Compare 12.0.7
+.EXAMPLE
+  Select-ReleaseNotes -ReleaseNotesPath ..\SQLDependencyTracker\RELEASENOTES.md
+
+  Version   Date                Blocks            Summary
+  -------   ----                ------            -------
+  2.8.9                         {Features, Fixes} Updated SQL Compare Engine
+  2.8.8.523 11/08/2016 00:00:00 {Fixes}           Updated SQL Compare Engine, Bug fixes
+  2.8.7.512 01/08/2016 00:00:00 {General}         Updated SQL Compare Engine, Bug fixes
+  2.8.6.499 12/07/2016 00:00:00 {Features}        Updated SQL Compare Engine, New feature usage reporting, Login licen...
+  2.8.5.530 26/04/2016 00:00:00 {Features}        SSMS 2016, Updated SQL Compare Engine, New feature usage reporting, ...
+  2.8.4.261 21/03/2016 00:00:00 {Features, Fixes} SSMS 2016, New appearance, Removed J#, Updated SQL Compare Engine, N...
+  2.8.3                         {Never released}  SSMS 2016, New appearance, Removed J#, Updated SQL Compare Engine, N...
+  2.8.2.138 17/11/2015 00:00:00 {Features, Fixes} SQL2016, SSMS 2016, New appearance, Removed J#, Updated SQL Compare ...
+  2.8.1.182 29/07/2014 00:00:00 {Features}        SQL2016, SSMS 2016, New appearance, Removed J#, Updated SQL Compare ...
+  
+.EXAMPLE
+  Select-ReleaseNotes -ProductName "SQL Source Control" -ReleaseNotesPath ..\SQLSourceControl\RELEASENOTES.md -Latest
+  
+  Version Date Blocks    Summary
+  ------- ---- ------    -------
+  5.1.5        {General} SQL Source Control 5.1.5
 #>
 function Select-ReleaseNotes {
     [CmdletBinding()]
@@ -82,7 +132,9 @@ function Select-ReleaseNotes {
         # The RELEASENOTES markdown to select from
         [string] $ReleaseNotes,
         # Only return the top version block in the file
-        [switch] $Latest
+        [switch] $Latest,
+        # Product name (if not using strapline this should be set to create a default summary based on at most 3 part version number)
+        [string] $ProductName = $nul
     )
     if ($ReleaseNotesPath) {
         $Lines = Get-Content $ReleaseNotesPath
@@ -127,7 +179,11 @@ function Select-ReleaseNotes {
                 if ($Release.Blocks.$CurrentHeader) {
                     $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
                 }
-                $Release.Summary = GetSummary -Release $Release -Accumulator $Accumulator
+                
+                # To see the accumulator in action un-comment this line
+                # $accumulator.GetEnumerator() | sort {$_.Key} -Descending
+                
+                $Release.Summary = GetSummary -ProductName $ProductName -Release $Release -Accumulator $Accumulator
                 $Release
 
                 # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
@@ -205,7 +261,7 @@ function Select-ReleaseNotes {
         if ($Release.Blocks.$CurrentHeader) {
             $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
         }
-        $Release.Summary = GetSummary -Release $Release -Accumulator $Accumulator
+        $Release.Summary = GetSummary -ProductName $ProductName -Release $Release -Accumulator $Accumulator
         $Release
     }
 }
