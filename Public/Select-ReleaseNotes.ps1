@@ -1,16 +1,54 @@
-function script:AddFeature($accumulator, [int] $priority, [string] $feature){
-    $key = "{0:0000000}" -f $priority
-    if ($accumulator.$key -ne $nul -and $accumulator.($key) -ne $feature)
-    {
-        # Uniqueify (in a consistent way) if the same priority is used
+function script:CreateRelease([version] $version)
+{
+    # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
+    # Set up the default display set and create the member set object for use later on
+    # Configure a default display set
+    $defaultDisplaySet = 'Version', 'Date', 'Blocks', 'Summary'
+
+    # Create the default property display set
+    $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
+    $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+    
+    # Default Release object is created here with nice properties when in a list
+    $release = [pscustomobject]@{
+        Version = $version
+        Date = $nul
+        Summary = $nul
+        Blocks = @{}
+    }
+    $release.PSObject.TypeNames.Insert(0,'RedGate.Build.VersionInformation')
+    $release | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+    
+    return $release
+}
+
+function script:FinalizeRelease($release, [string]$currentHeader, [string]$productName, $accumulator) {
+    if ($release.Blocks.$currentHeader) {
+        $release.Blocks.$currentHeader = $release.Blocks.$currentHeader.Trim()
+    }
+    
+    # To see the accumulator in action un-comment this line
+    # $accumulator.GetEnumerator() | sort {$_.Key} -Descending
+    
+    $release.Summary = GetSummary -ProductName $productName -Release $release -Accumulator $accumulator
+}
+
+function script:AddFeature($accumulator, [int] $priority, [string] $feature) {
+    # If the same feature exists at a lower priority - raise the priority for the given priority
+    if ($accumulator.Values -contains $feature) {
+        $accumulator.Remove(($accumulator.GetEnumerator() |? {$_.Value -eq $feature}).Key)
+    }
+    
+    $key = "{0:0000000}" -f $priority    
+    # Uniqueify (in a consistent way) if the same priority is used
+    if ($accumulator.$key -ne $nul -and $accumulator.($key) -ne $feature) {
         $key = "{0:0000000}-$feature" -f $priority
     }
-    # TODO if the same feature exists at a lower priority - raise the priority for the given priority
+
     $accumulator.($key) = $feature
 }
 
-function script:GetSummary($productName, $release, $accumulator)
-{    
+function script:GetSummary($productName, $release, $accumulator) {    
     $summary = $accumulator.GetEnumerator() | sort {$_.Key} -Descending
     if ($summary) {
         return [string]::Join(", ", $summary.Value)
@@ -145,15 +183,6 @@ function Select-ReleaseNotes {
         throw 'No $ReleaseNotesPath or $ReleaseNotes specified'
     }
 
-    # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
-    # Set up the default display set and create the member set object for use later on
-    # Configure a default display set
-    $defaultDisplaySet = 'Version', 'Date', 'Blocks', 'Summary'
-
-    # Create the default property display set
-    $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet',[string[]]$defaultDisplaySet)
-    $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
-
     $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?)(\s*-\s*(?<date>.*))?\s*$'
     $HeaderRegex = '^#+\s*(?<header>.+):?\s*$'
     $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
@@ -164,7 +193,7 @@ function Select-ReleaseNotes {
     $StraplineAccumulator = $false
     $Release = $nul
     $IgnoreRest = $false
-
+    
     $Lines | ForEach-Object {
         if ($IgnoreRest)
         {
@@ -176,16 +205,11 @@ function Select-ReleaseNotes {
         if ($VersionMatch.Success) {
             # If a $Release already was being filled in - clean it up and return it
             if ($Release) {
-                if ($Release.Blocks.$CurrentHeader) {
-                    $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
-                }
-                
-                # To see the accumulator in action un-comment this line
-                # $accumulator.GetEnumerator() | sort {$_.Key} -Descending
-                
-                $Release.Summary = GetSummary -ProductName $ProductName -Release $Release -Accumulator $Accumulator
-                $Release
+                FinalizeRelease -Release $Release -ProductName $ProductName -CurrentHeader $CurrentHeader -Accumulator $Accumulator
 
+                # Return out of the pipeline
+                $Release
+                
                 # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
                 if ($Latest) {
                     $IgnoreRest = $true
@@ -194,19 +218,10 @@ function Select-ReleaseNotes {
                 }
             }
             
-            
-
             # Default Release object is created here with nice properties when in a list
             $CurrentHeader = 'General'
             $StraplineAccumulator = $false
-            $Release = [pscustomobject]@{
-                Version = [version] $VersionMatch.Groups['version'].Value
-                Date = $nul
-                Summary = $nul
-                Blocks = @{}
-            }
-            $Release.PSObject.TypeNames.Insert(0,'RedGate.Build.VersionInformation')
-            $Release | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+            $Release = CreateRelease -Version $VersionMatch.Groups['version'].Value
 
             # Add the SQL Compare style date to the object if found
             if ($VersionMatch.Groups['date'].Success) {
@@ -258,10 +273,7 @@ function Select-ReleaseNotes {
     }
     # Clean up and return the last $Release object being populated (if there is one)
     if ($Release) {
-        if ($Release.Blocks.$CurrentHeader) {
-            $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
-        }
-        $Release.Summary = GetSummary -ProductName $ProductName -Release $Release -Accumulator $Accumulator
+        FinalizeRelease -Release $Release -ProductName $ProductName -CurrentHeader $CurrentHeader -Accumulator $Accumulator
         $Release
     }
 }

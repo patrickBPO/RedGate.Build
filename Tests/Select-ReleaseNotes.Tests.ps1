@@ -33,7 +33,7 @@ Describe 'Read-ReleaseNotes' {
             $v.Blocks.General | Should Be $nul
         }
     }
-    
+
     InModuleScope RedGate.Build {
         Context 'SDT Top' {
             $v = Select-ReleaseNotes -ReleaseNotes @"
@@ -57,7 +57,7 @@ Cool feature
             $v.Blocks.Fixes | Should Be '* Nasty fix'
         }
     }
-    
+
     InModuleScope RedGate.Build {
         Context 'SOC Date' {
             $v = Select-ReleaseNotes -ProductName "SQL Source Control" -ReleaseNotes @"
@@ -70,7 +70,7 @@ Cool feature
             $v.Blocks.General | Should Be $nul
         }
     }
-    
+
     InModuleScope RedGate.Build {
         Context 'SQL Compare Date' {
             $v = Select-ReleaseNotes -ProductName "SQL Compare" -ReleaseNotes @"
@@ -82,7 +82,7 @@ Cool feature
             $v.Blocks.General | Should Be $nul
         }
     }
-        
+
     InModuleScope RedGate.Build {
         Context 'Multiple Versions' {
             $vs = Select-ReleaseNotes -ReleaseNotes @"
@@ -117,7 +117,7 @@ Cool feature
             $vs[0].Blocks.General | Should Be $nul
             $vs[0].Blocks.Features | Should Be '* Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.'
             $vs[0].Blocks.Fixes | Should Be '* Latest UI components, fixes initial window position, layout issues and a rare crash'
-            
+
             $vs[1].Version | Should Be '2.8.8.523'
             $vs[1].Summary | Should Be 'Updated SQL Compare Engine, Bug Fixes'
             $vs[1].Date | Should Be ([DateTime] '2016-08-11')
@@ -128,7 +128,7 @@ Cool feature
 * Latest UI components, uses a more legible font on the menu
 * Old activations of SQL Dependency Tracker now work as expected
 "@
-            
+
             $vs[2].Version | Should Be '2.8.7.512'
             $vs[2].Summary | Should Be 'Updated SQL Compare Engine, Bug Fixes'
             $vs[2].Date | Should Be ([DateTime] '2016-08-01')
@@ -137,7 +137,7 @@ Cool feature
             $vs[2].Blocks.Fixes | Should Be $nul
         }
     }
-    
+
     InModuleScope RedGate.Build {
         Context 'Latest Multiple Versions' {
             $v = Select-ReleaseNotes -ProductName "Test" -Latest -ReleaseNotes @"
@@ -165,6 +165,70 @@ Cool feature
             $v.Blocks.General | Should Be $nul
             $v.Blocks.Features | Should Be '* Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.'
             $v.Blocks.Fixes | Should Be '* Latest UI components, fixes initial window position, layout issues and a rare crash'
+        }
+    }
+
+    InModuleScope RedGate.Build {
+        Context 'Strapline Same Priority' {
+            $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
+## 1.2.3.4
+### Strapline
+50.Top
+10.Bottom
+
+## 1.0.0.0
+### Strapline
+10.Also Bottom
+"@
+            $vs.Length | Should Be 2
+            $vs[0].Version | Should Be '1.2.3.4'
+            $vs[0].Summary | Should Be 'Top, Bottom'
+
+            $vs[1].Version | Should Be '1.0.0.0'
+            $vs[1].Summary | Should Be 'Top, Also Bottom, Bottom'
+        }
+    }
+    
+    InModuleScope RedGate.Build {
+        Context 'Older Feature Higher Priority' {
+            $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
+## 1.2.3.4
+### Strapline
+50.Top
+10.Thing
+
+## 1.0.0.0
+### Strapline
+99.Thing
+"@
+            $vs.Length | Should Be 2
+            $vs[0].Version | Should Be '1.2.3.4'
+            $vs[0].Summary | Should Be 'Top, Thing'
+
+            $vs[1].Version | Should Be '1.0.0.0'
+            $vs[1].Summary | Should Be 'Thing, Top'
+        }
+    }
+        
+    InModuleScope RedGate.Build {
+        Context 'Duplicate Priority Older Feature Higher Priority' {
+            $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
+## 1.2.3.4
+### Strapline
+50.Top
+10.Other thing
+10.Thing
+
+## 1.0.0.0
+### Strapline
+99.Thing
+"@
+            $vs.Length | Should Be 2
+            $vs[0].Version | Should Be '1.2.3.4'
+            $vs[0].Summary | Should Be 'Top, Thing, Other thing'
+
+            $vs[1].Version | Should Be '1.0.0.0'
+            $vs[1].Summary | Should Be 'Thing, Top, Other thing'
         }
     }
 }
