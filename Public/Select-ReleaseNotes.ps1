@@ -163,11 +163,13 @@ function script:GetSummary($productName, $release, $accumulator) {
   5.1.5        {General} SQL Source Control 5.1.5
 #>
 function Select-ReleaseNotes {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Path')]
     param(
         # The path of the RELEASENOTES.md file to read from
+        [Parameter(Mandatory = $true, ParameterSetName = 'Path', Position = 0)]
         [string] $ReleaseNotesPath,
         # The RELEASENOTES markdown to select from
+        [Parameter(Mandatory = $true, ParameterSetName = 'String', Position = 0)]
         [string] $ReleaseNotes,
         # Only return the top version block in the file
         [switch] $Latest,
@@ -180,6 +182,7 @@ function Select-ReleaseNotes {
         # Makes testing easier
         $Lines = ($ReleaseNotes -Replace "'r").Split("`n")
     } else {
+        # Shouldn't happen due to ParameterSetName usage above
         throw 'No $ReleaseNotesPath or $ReleaseNotes specified'
     }
 
