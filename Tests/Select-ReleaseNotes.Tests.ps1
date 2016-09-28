@@ -1,6 +1,6 @@
 #requires -Version 4 -Modules Pester
 
-Describe 'Read-ReleaseNotes' {
+Describe 'Select-ReleaseNotes' {
     InModuleScope RedGate.Build {
         Context 'Two Part Version' {
             Mock Get-Content { '# 1.2' }
