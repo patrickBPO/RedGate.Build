@@ -51,14 +51,12 @@ Describe 'Read-ReleaseNotes' {
             $info.Version | Should Be "19.99"
         }
 
-        Context 'Ignore Wrong Version' {
+        Context 'Fail If Not First Version' {
             Mock Get-Content {
                 "# 1.2.3"
                 "# 19.99"
             }
-            $info = Read-ReleaseNotes -ReleaseNotesPath "DoesNotExist\RELEASENOTES.md"
-            $info.Content | Should Be "# 19.99"
-            $info.Version | Should Be "19.99"
+            { Read-ReleaseNotes -ReleaseNotesPath "DoesNotExist\RELEASENOTES.md" } | Should Throw
         }
     }
 }

@@ -2,7 +2,7 @@
 .SYNOPSIS
   Retrieves version information and release notes from a RELEASENOTES.md file
 .DESCRIPTION
-  1. Scans $ReleaseNotesPath for the first line matching [^\.][0-9]+\.[0-9]+$ or [^\.][0-9]+\.[0-9]+\.[0-9]+$
+  1. Scans $ReleaseNotesPath for the first line matching ^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$
   2. That line and all subsequent lines are appended
   3. Return object contains Content and Version properties for retrieved information
 .EXAMPLE
@@ -24,19 +24,20 @@ function Read-ReleaseNotes {
     $Lines = Get-Content $ReleaseNotesPath
     $Result = @()
     $Version = $Null
-    if ($ThreePartVersion) {
-        $Regex = '[^\.][0-9]+\.[0-9]+.[0-9]+$'
-    }
-    else {
-        $Regex = '[^\.][0-9]+\.[0-9]+$'
-    }
+    $VersionRegex = '^#+\s*(?<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$'
         
     $Lines | ForEach-Object {
         $Line = $_.Trim()
         if (-not $Version) {
-            $Match = [regex]::Match($Line, $Regex)
+            $Match = [regex]::Match($Line, $VersionRegex)
             if ($Match.Success) {
-                $Version = $Match.Value
+                $Version = [version] $Match.Groups['version'].Value
+                if ($ThreePartVersion -and ($Version.Build -eq -1)) {
+                    throw "Found two part version first '$Line'"
+                }
+                if (!$ThreePartVersion -and ($Version.Build -ne -1)) {
+                    throw "Found three part version first '$Line'"
+                }
             }
         }
         if ($Version) {
@@ -48,6 +49,6 @@ function Read-ReleaseNotes {
     }
     return @{
         Content = $Result -join [System.Environment]::NewLine
-        Version = [version] $Version
+        Version = $Version
     }
 }
