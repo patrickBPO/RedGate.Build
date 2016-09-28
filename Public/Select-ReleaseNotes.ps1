@@ -1,4 +1,4 @@
-function script:CreateRelease([version] $version)
+function CreateRelease([version] $version)
 {
     # https://learn-powershell.net/2013/08/03/quick-hits-set-the-default-property-display-in-powershell-on-custom-objects/
     # Set up the default display set and create the member set object for use later on
@@ -22,7 +22,7 @@ function script:CreateRelease([version] $version)
     return $release
 }
 
-function script:FinalizeRelease($release, [string]$currentHeader, [string]$productName, $accumulator) {
+function FinalizeRelease($release, [string]$currentHeader, [string]$productName, $accumulator) {
     if ($release.Blocks.$currentHeader) {
         $release.Blocks.$currentHeader = $release.Blocks.$currentHeader.Trim()
     }
@@ -33,7 +33,7 @@ function script:FinalizeRelease($release, [string]$currentHeader, [string]$produ
     $release.Summary = GetSummary -ProductName $productName -Release $release -Accumulator $accumulator
 }
 
-function script:AddFeature($accumulator, [int] $priority, [string] $feature) {
+function AddFeature($accumulator, [int] $priority, [string] $feature) {
     # If the same feature exists at a lower priority - raise the priority for the given feature
     if ($accumulator.Values -contains $feature) {
         $accumulator.Remove(($accumulator.GetEnumerator() |? {$_.Value -eq $feature}).Key)
@@ -48,7 +48,7 @@ function script:AddFeature($accumulator, [int] $priority, [string] $feature) {
     $accumulator.($key) = $feature
 }
 
-function script:GetSummary($productName, $release, $accumulator) {    
+function GetSummary($productName, $release, $accumulator) {    
     $summary = $accumulator.GetEnumerator() | sort {$_.Key} -Descending
     if ($summary) {
         return [string]::Join(", ", $summary.Value)
