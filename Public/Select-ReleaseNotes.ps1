@@ -34,7 +34,7 @@ function script:FinalizeRelease($release, [string]$currentHeader, [string]$produ
 }
 
 function script:AddFeature($accumulator, [int] $priority, [string] $feature) {
-    # If the same feature exists at a lower priority - raise the priority for the given priority
+    # If the same feature exists at a lower priority - raise the priority for the given feature
     if ($accumulator.Values -contains $feature) {
         $accumulator.Remove(($accumulator.GetEnumerator() |? {$_.Value -eq $feature}).Key)
     }
@@ -72,7 +72,7 @@ function script:GetSummary($productName, $release, $accumulator) {
   Date = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
   Header = '^#+\s*(?<header>.+):?$'
   StraplineBlock = '^#+\s*Strapline\s*$'
-  Strapline = '^\s*(?<priority>[0-9]+)\.?\s*(?<feature>.*)\s*$'
+  Strapline = '^\s*(?<priority>[0-9]+)\s*-?\s*(?<feature>[^\.]*)\s*$'
 
   Example input
   -------------
@@ -97,9 +97,9 @@ function script:GetSummary($productName, $release, $accumulator) {
   ## 2.8.6.499
   ###### Released on 2016-07-12
   ### Strapline
-  65. Updated SQL Compare Engine
-  50. Login licensing
-  50. New feature usage reporting
+  65 - Updated SQL Compare Engine
+  50 - Login licensing
+  50 - New feature usage reporting
   
   ### Features
   * New login based licensing: see https://www.red-gate.com/user-licensing for more details
@@ -111,7 +111,7 @@ function script:GetSummary($productName, $release, $accumulator) {
   ## 2.8.5.530
   ###### Released on 2016-04-26
   ### Strapline
-  90. SSMS 2016
+  90 - SSMS 2016
   
   ### Features
   * Support for SSMS March 2016 Preview Refresh (VS2015 shell)
@@ -187,7 +187,7 @@ function Select-ReleaseNotes {
     $HeaderRegex = '^#+\s*(?<header>.+):?\s*$'
     $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
     $StraplineStartRegex = '^#+\s*Strapline\s*$'
-    $StraplineRegex = '^\s*(?<priority>[0-9]+)\.?\s*(?<feature>.*)\s*$'
+    $StraplineRegex = '^\s*(?<priority>[0-9]+)\s*-?\s*(?<feature>[^\.]*)\s*$'
 
     $Accumulator = @{}
     $StraplineAccumulator = $false
@@ -254,7 +254,7 @@ function Select-ReleaseNotes {
                     if ($Line) {
                         $StraplineMatch = [regex]::Match($Line, $StraplineRegex)
                         if (!$StraplineMatch.Success) {
-                            throw "Strapline expected, encountered '$Line'"
+                            throw "Strapline expected (eg 123 - Title), encountered '$Line'"
                         }
                         AddFeature -accumulator $Accumulator `
                             -priority $StraplineMatch.Groups['priority'].Value `

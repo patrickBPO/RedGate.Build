@@ -41,7 +41,7 @@ Describe 'Read-ReleaseNotes' {
 ## 2.8.9
 General content
 ### Strapline
-100. Feature
+100 - Feature
 
 ### Features
 Cool feature
@@ -89,7 +89,7 @@ Cool feature
 # SQL Dependency Tracker Release Notes
 ## 2.8.9
 ### Strapline
-65. Updated SQL Compare Engine
+65 - Updated SQL Compare Engine
 
 ### Features
 * Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.
@@ -100,7 +100,7 @@ Cool feature
 ## 2.8.8.523
 ###### Released on 2016-08-11
 ### Strapline
-10. Bug fixes
+10 - Bug fixes
 
 ### Fixes
 * Updated feature usage reporting library
@@ -173,12 +173,12 @@ Cool feature
             $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
 ## 1.2.3.4
 ### Strapline
-50.Top
-10.Bottom
+50-Top
+10-Bottom
 
 ## 1.0.0.0
 ### Strapline
-10.Also Bottom
+10 Also Bottom
 "@
             $vs.Length | Should Be 2
             $vs[0].Version | Should Be '1.2.3.4'
@@ -194,12 +194,12 @@ Cool feature
             $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
 ## 1.2.3.4
 ### Strapline
-50.Top
-10.Thing
+50 - Top
+10 -Thing
 
 ## 1.0.0.0
 ### Strapline
-99.Thing
+99- Thing
 "@
             $vs.Length | Should Be 2
             $vs[0].Version | Should Be '1.2.3.4'
@@ -215,13 +215,13 @@ Cool feature
             $vs = Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
 ## 1.2.3.4
 ### Strapline
-50.Top
-10.Other thing
-10.Thing
+50 - Top
+10 - Other thing
+10 - Thing
 
 ## 1.0.0.0
 ### Strapline
-99.Thing
+99 - Thing
 "@
             $vs.Length | Should Be 2
             $vs[0].Version | Should Be '1.2.3.4'
@@ -229,6 +229,26 @@ Cool feature
 
             $vs[1].Version | Should Be '1.0.0.0'
             $vs[1].Summary | Should Be 'Thing, Top, Other thing'
+        }
+    }
+
+    InModuleScope RedGate.Build {
+        Context 'Invalid Strapline' {
+            { Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
+## 1.2.3.4
+### Strapline
+50. This would look like 1. xxx on github (bad)
+"@} | Should Throw
+        }
+    }
+    
+    InModuleScope RedGate.Build {
+        Context 'Not Strapline' {
+            { Select-ReleaseNotes -ProductName "Test" -ReleaseNotes @"
+## 1.2.3.4
+### Strapline
+Just trying to put any text here isn't allowed
+"@} | Should Throw
         }
     }
 }
