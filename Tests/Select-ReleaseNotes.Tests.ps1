@@ -118,16 +118,16 @@ Cool feature
             $vs[0].Blocks.Features | Should Be '* Updated to the latest SQL Compare engine, version 12, featuring a number of fixes and enhancements.  Removes support for SQL Server 2000 databases.'
             $vs[0].Blocks.Fixes | Should Be '* Latest UI components, fixes initial window position, layout issues and a rare crash'
 
+            $fixes = '* Updated feature usage reporting library' + [System.Environment]::NewLine + `
+'* Latest UI components, uses a more legible font on the menu' + [System.Environment]::NewLine + `
+'* Old activations of SQL Dependency Tracker now work as expected'
+
             $vs[1].Version | Should Be '2.8.8.523'
             $vs[1].Summary | Should Be 'Updated SQL Compare Engine, Bug Fixes'
             $vs[1].Date | Should Be ([DateTime] '2016-08-11')
             $vs[1].Blocks.General | Should Be $nul
             $vs[1].Blocks.Features | Should Be $nul
-            $vs[1].Blocks.Fixes | Should Be @"
-* Updated feature usage reporting library
-* Latest UI components, uses a more legible font on the menu
-* Old activations of SQL Dependency Tracker now work as expected
-"@
+            $vs[1].Blocks.Fixes | Should Be $fixes
 
             $vs[2].Version | Should Be '2.8.7.512'
             $vs[2].Summary | Should Be 'Updated SQL Compare Engine, Bug Fixes'
