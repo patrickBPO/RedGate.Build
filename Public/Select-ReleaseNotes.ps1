@@ -192,15 +192,9 @@ function Select-ReleaseNotes {
     $Accumulator = @{}
     $StraplineAccumulator = $false
     $Release = $nul
-    $IgnoreRest = $false
     
-    $Lines | ForEach-Object {
-        if ($IgnoreRest)
-        {
-            # I seem to have to keep processing
-            return
-        }
-        $Line = $_.Trim()
+    foreach($Line in $Lines) {
+        $Line = $Line.Trim()
         $VersionMatch = [regex]::Match($Line, $VersionRegex)
         if ($VersionMatch.Success) {
             # If a $Release already was being filled in - clean it up and return it
@@ -210,11 +204,10 @@ function Select-ReleaseNotes {
                 # Return out of the pipeline
                 $Release
                 
-                # If only getting one then ensure I skip everything else - can't use continue/break in a ForEach-Object
+                # If only getting one then ensure I skip everything else
                 if ($Latest) {
-                    $IgnoreRest = $true
                     $Release = $nul
-                    return
+                    break
                 }
             }
             
@@ -249,6 +242,7 @@ function Select-ReleaseNotes {
                 $StraplineAccumulator = $false
                 $CurrentHeader = $HeaderMatch.Groups['header'].Value
             } else {
+                # This is a line in a block, either a Strapline or a "normal" line
                 if ($StraplineAccumulator) {
                     # Ignore newlines in Strapline section
                     if ($Line) {
@@ -271,6 +265,7 @@ function Select-ReleaseNotes {
             }
         }
     }
+
     # Clean up and return the last $Release object being populated (if there is one)
     if ($Release) {
         FinalizeRelease -Release $Release -ProductName $ProductName -CurrentHeader $CurrentHeader -Accumulator $Accumulator
