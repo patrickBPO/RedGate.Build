@@ -72,7 +72,7 @@ function GetSummary($productName, $release, $accumulator) {
   Date = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
   Header = '^#+\s*(?<header>.+):?$'
   StraplineBlock = '^#+\s*Strapline\s*$'
-  Strapline = '^\s*(?<priority>[0-9]+)\s*-?\s*(?<feature>[^\.]*)\s*$'
+  Strapline = '^\s*(?<priority>[0-9]+)\s*-\s*(?<feature>.*)\s*$'
 
   Example input
   -------------
@@ -190,7 +190,7 @@ function Select-ReleaseNotes {
     $HeaderRegex = '^#+\s*(?<header>.+):?\s*$'
     $DateRegex = '^#+\s*.*(?<date>\d\d\d\d.\d\d.\d\d)'
     $StraplineStartRegex = '^#+\s*Strapline\s*$'
-    $StraplineRegex = '^\s*(?<priority>[0-9]+)\s*-?\s*(?<feature>[^\.]*)\s*$'
+    $StraplineRegex = '^\s*(?<priority>[0-9]+)\s*-\s*(?<feature>.*)\s*$'
 
     $Accumulator = @{}
     $StraplineAccumulator = $false

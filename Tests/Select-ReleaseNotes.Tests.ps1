@@ -178,7 +178,7 @@ Cool feature
 
 ## 1.0.0.0
 ### Strapline
-10 Also Bottom
+10          -              Also Bottom
 "@
             $vs.Length | Should Be 2
             $vs[0].Version | Should Be '1.2.3.4'
@@ -249,6 +249,18 @@ Cool feature
 ### Strapline
 Just trying to put any text here isn't allowed
 "@} | Should Throw
+        }
+    }
+    
+    InModuleScope RedGate.Build {
+        Context 'Version in Strapline' {
+            $v = Select-ReleaseNotes -ProductName "Test" -Latest -ReleaseNotes @"
+## 3.1.1
+### Strapline
+50 - SQL Doc 3.1.1
+"@
+            $v.Version | Should Be '3.1.1'
+            $v.Summary | Should Be 'SQL Doc 3.1.1'
         }
     }
 }
