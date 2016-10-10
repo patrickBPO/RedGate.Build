@@ -24,6 +24,9 @@ Describe 'New-SemanticNuGetPackageVersion' {
         It 'should return a semantic version with branch suffix that includes the revision number with fewer digits, when the revision suffix length is reduced' {
             New-SemanticNuGetPackageVersion -Version '1.3.5.7' -IsDefaultBranch $False -BranchName 'SomeBranch' -RevisionSuffixLength 2 | Should Be '1.3.5-SomeBranch07'
         }
+        It 'should return a semantic version with branch suffix that excludes the revision number, when the revision suffix length is zero' {
+            New-SemanticNuGetPackageVersion -Version '1.3.5.7' -IsDefaultBranch $False -BranchName 'SomeBranch' -RevisionSuffixLength 0 | Should Be '1.3.5-SomeBranch'
+        }
         It 'should return a semantic version with truncated branch suffix that includes the revision number, for a long branch name' {
             New-SemanticNuGetPackageVersion -Version '1.3.5.7' -IsDefaultBranch $False -BranchName 'SomeBranchSomeBranchSomeBranch' | Should Be '1.3.5-SomeBranchSomeBr0007'
         }

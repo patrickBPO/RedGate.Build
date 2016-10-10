@@ -44,7 +44,7 @@ function New-SemanticNuGetPackageVersion
         [Parameter(Mandatory = $true)]
         [bool] $IsDefaultBranch,
         
-        # The minimum number of characters at the end of a pre-release suffix that is devoted to the digits of the revision number. Defaults to 4 (e.g. '1.0.0-MyBranch0236'). You could reduce this to 3 if your revision numbers never exceed 999, to free up an additional character for the branch name.
+        # The minimum number of characters at the end of a pre-release suffix that is devoted to the digits of the revision number. Defaults to 4 (e.g. '1.0.0-MyBranch0236'). You could reduce this to 3 if your revision numbers never exceed 999, to free up an additional character for the branch name. You could reduce this to zero if you don't want the revision number to appear in the suffix at all (or just specify a 3-digit version for the -Version parameter instead).
         [Parameter(Mandatory = $false)]
         [int] $RevisionSuffixLength = 4
     )
