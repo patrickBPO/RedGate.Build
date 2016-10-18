@@ -4,7 +4,7 @@
 .SYNOPSIS
   Obtains a NuGet package version based on the build version number and branch name.
 .DESCRIPTION
-  Obtains a NuGet package version based on a 4-digit build version number, the branch name and whether or not the branch is the default branch.
+  Obtains a NuGet package version based on a 3 or 4-digit build version number, the branch name and whether or not the branch is the default branch.
 .OUTPUTS
   A NuGet version string based on the input parameters. The string is also suitable for use as an assembly's AssemblyInformationalVersion attribute value.
 .EXAMPLE
@@ -24,7 +24,7 @@ function New-NuGetPackageVersion
 {
     [CmdletBinding()]
     param(
-        # A four digit version number of the form Major.Minor.Patch.Revision.
+        # A three or four digit version number of the form Major.Minor.Patch.Revision.
         [Parameter(Mandatory = $true)]
         [version] $Version,
 
