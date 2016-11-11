@@ -61,6 +61,7 @@ function Invoke-NUnit3ForAssembly {
       -AssemblyPath $AssemblyPath `
       -x86 $x86.IsPresent `
       -FrameworkVersion $FrameworkVersion `
+      -Where $Where `
       -TestResultFilenamePattern $TestResultFilenamePattern
 
     $NunitExecutable = Get-NUnit3ConsoleExePath -NUnitVersion $NUnitVersion
