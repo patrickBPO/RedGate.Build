@@ -15,6 +15,8 @@
   Coverage filters for dotCover, to indicate what should and should not be covered.
 .PARAMETER AttributeFilters
   Attribute coverage filters for dotCover, to indicate what should and should not be covered.
+.PARAMETER ProcessFilters
+  Process coverage filters for dotCover, to indicate what should and should not be covered. Requires Dot Cover 2016.2 or later.
 #>
 function Invoke-DotCoverForExecutable {
   [CmdletBinding()]
@@ -36,7 +38,10 @@ function Invoke-DotCoverForExecutable {
     [string] $Filters = '',
 
     [Parameter(Mandatory = $False)]
-    [string] $AttributeFilters = ''
+    [string] $AttributeFilters = '',
+
+    [Parameter(Mandatory = $False)]
+    [string] $ProcessFilters = ''
   )
 
   $DotCoverArguments = @(
@@ -52,6 +57,10 @@ function Invoke-DotCoverForExecutable {
 
   if (![string]::IsNullOrWhiteSpace($AttributeFilters)) {
     $DotCoverArguments += "/AttributeFilters=$AttributeFilters"
+  }
+
+  if (![string]::IsNullOrWhiteSpace($ProcessFilters)) {
+    $DotCoverArguments += "/ProcessFilters=$ProcessFilters"
   }
 
   if ($TargetArguments) {

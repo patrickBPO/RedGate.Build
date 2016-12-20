@@ -33,7 +33,8 @@ param(
     [bool] $EnableCodeCoverage = $false,
     # The version of the nuget package containing DotCover.exe (JetBrains.dotCover.CommandLineTools)
     [string] $DotCoverVersion = '3.2.0',
-    [string] $DotCoverFilters = ''
+    [string] $DotCoverFilters = '',
+    [string] $DotCoverProcessFilters = ''
 )
 
 task TestSingleAssembly {
@@ -49,7 +50,8 @@ task TestSingleAssembly {
     -IncludedCategories $IncludedCategories `
     -EnableCodeCoverage $EnableCodeCoverage `
     -DotCoverVersion $DotCoverVersion `
-    -DotCoverFilters $DotCoverFilters
+    -DotCoverFilters $DotCoverFilters `
+    -DotCoverProcessFilters $DotCoverProcessFilters
 
   Remove-Module RedGate.Build
 }
