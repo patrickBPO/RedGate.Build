@@ -21,7 +21,11 @@ function Merge-CoverageReports {
 
     # The folder where the merged coverage report will be saved.
     # If not set, this will default to the value of -SnapshotsDir
-    [string] $CoverageOutputDir
+    [string] $CoverageOutputDir,
+
+    #The version of dotCover nuget package to use.
+    [Parameter(Mandatory = $False)]
+    [string] $DotCoverVersion = $DefaultDotCoverVersion
   )
 
   if(!$CoverageOutputDir) {
@@ -32,7 +36,7 @@ function Merge-CoverageReports {
       New-Item $CoverageOutputDir -ItemType Directory -Force | Out-Null
   }
 
-  $DotCoverPath = Get-DotCoverExePath
+  $DotCoverPath = Get-DotCoverExePath -DotCoverVersion $DotCoverVersion
 
   $MergedSnapshotPath = "$CoverageOutputDir\coverage.dcvr"
   # Use -ErrorAction SilentlyContinue to survive windows "path is too long" errors.
