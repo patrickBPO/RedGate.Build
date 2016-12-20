@@ -42,7 +42,9 @@ function Invoke-NUnit3ForAssembly {
     # The dotcover filters passed to dotcover.exe
     [string] $DotCoverFilters = '',
     # The dotcover filters passed to dotcover.exe
-    [string] $DotCoverAttributeFilters = ''
+    [string] $DotCoverAttributeFilters = '',
+    # The dotcover process filters passed to dotcover.exe. Requires dotcover version 2016.2 or later
+    [string] $DotCoverProcessFilters = ''
   )
 
   Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState -Name 'VerbosePreference'
@@ -73,7 +75,8 @@ function Invoke-NUnit3ForAssembly {
         -OutputFile "$AssemblyPath.$TestResultFilenamePattern.coverage.snap" `
         -DotCoverVersion $DotCoverVersion `
         -Filters $DotCoverFilters `
-        -AttributeFilters $DotCoverAttributeFilters
+        -AttributeFilters $DotCoverAttributeFilters `
+        -ProcessFilters $DotCoverProcessFilters
 
     } else {
 

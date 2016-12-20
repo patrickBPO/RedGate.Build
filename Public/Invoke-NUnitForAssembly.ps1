@@ -45,6 +45,8 @@ function Invoke-NUnitForAssembly {
     [string] $DotCoverFilters = '',
     # The dotcover filters passed to dotcover.exe
     [string] $DotCoverAttributeFilters = '',
+    # The dotcover process filters passed to dotcover.exe. Requires dotcover version 2016.2 or later
+    [string] $DotCoverProcessFilters = '',
     # If set, do not import test results automatically to Teamcity.
     # In this case it is the responsibility of the caller to call 'TeamCity-ImportNUnitReport "$AssemblyPath.$TestResultFilenamePattern.xml"'
     [switch] $DotNotImportResultsToTeamcity
@@ -83,7 +85,8 @@ function Invoke-NUnitForAssembly {
         -OutputFile "$AssemblyPath.$TestResultFilenamePattern.coverage.snap" `
         -DotCoverVersion $DotCoverVersion `
         -Filters $DotCoverFilters `
-        -AttributeFilters $DotCoverAttributeFilters
+        -AttributeFilters $DotCoverAttributeFilters `
+        -ProcessFilters $DotCoverProcessFilters
 
     } else {
 
