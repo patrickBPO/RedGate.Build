@@ -14,7 +14,7 @@ function CreateRelease([version] $version)
         Version = $version
         Date = $nul
         Summary = $nul
-        Blocks = @{}
+        Blocks = @()
     }
     $release.PSObject.TypeNames.Insert(0,'RedGate.Build.VersionInformation')
     $release | Add-Member MemberSet PSStandardMembers $PSStandardMembers
@@ -22,9 +22,24 @@ function CreateRelease([version] $version)
     return $release
 }
 
-function FinalizeRelease($release, [string]$currentHeader, [string]$productName, $accumulator) {
-    if ($release.Blocks.$currentHeader) {
-        $release.Blocks.$currentHeader = $release.Blocks.$currentHeader.Trim()
+function TrimBlocks($release) {
+    foreach($block in $release.Blocks) {
+        $block.Value = $block.Value.Trim();
+    } 
+}
+
+function FinalizeRelease($release, [string]$productName, $accumulator, $convertBlocksToObject) {
+    TrimBlocks($release)
+
+    if ($convertBlocksToObject) {
+        $blocksObject = @{}
+
+        foreach ($block in $release.Blocks) {
+            $name = $block.Name
+            $blocksObject.$name = $block.Value
+        }
+
+        $release.Blocks = $blocksObject
     }
     
     # To see the accumulator in action un-comment this line
@@ -46,6 +61,19 @@ function AddFeature($accumulator, [int] $priority, [string] $feature) {
     }
 
     $accumulator.($key) = $feature
+}
+
+function AddToBlock($release, [string]$currentHeader, [string]$line) {
+    $matchingBlock = $release.Blocks |? {$_.Name -eq $currentHeader} | Select -First 1
+
+    if ($matchingBlock) {
+        $matchingBlock.Value += [System.Environment]::NewLine + $line
+    } else {
+        $release.Blocks += [pscustomobject]@{
+            Name = $currentHeader
+            Value = $line
+        }
+    }
 }
 
 function GetSummary($productName, $release, $accumulator) {    
@@ -174,7 +202,9 @@ function Select-ReleaseNotes {
         # Only return the top version block in the file
         [switch] $Latest,
         # Product name (if not using strapline this should be set to create a default summary based on at most 3 part version number)
-        [string] $ProductName = $nul
+        [string] $ProductName = $nul,
+        # Return the Blocks collection as an ordered array refleting the order of sections in the input rather than an unordered dictionary
+        [switch] $BlocksInOrder
     )
     if ($ReleaseNotesPath) {
         $Lines = Get-Content $ReleaseNotesPath
@@ -192,9 +222,12 @@ function Select-ReleaseNotes {
     $StraplineStartRegex = '^#+\s*Strapline\s*$'
     $StraplineRegex = '^\s*(?<priority>[0-9]+)\s*-\s*(?<feature>.*)\s*$'
 
+    $convertBlocksToObject = !$BlocksInOrder;
+
     $Accumulator = @{}
     $StraplineAccumulator = $false
     $Release = $nul
+    $CurrentBlockIndex = 0;
     
     foreach($Line in $Lines) {
         $Line = $Line.Trim()
@@ -202,7 +235,7 @@ function Select-ReleaseNotes {
         if ($VersionMatch.Success) {
             # If a $Release already was being filled in - clean it up and return it
             if ($Release) {
-                FinalizeRelease -Release $Release -ProductName $ProductName -CurrentHeader $CurrentHeader -Accumulator $Accumulator
+                FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator -ConvertBlocksToObject $convertBlocksToObject
 
                 # Return out of the pipeline
                 $Release
@@ -238,10 +271,7 @@ function Select-ReleaseNotes {
                 # Start the strapline accumulator
                 $StraplineAccumulator = $true
             } elseif ($HeaderMatch.Success) {
-                # New header, remove any trailing blank lines and prepare to add to new block
-                if ($Release.Blocks.$CurrentHeader) {
-                    $Release.Blocks.$CurrentHeader = $Release.Blocks.$CurrentHeader.Trim()
-                }
+                # New header, prepare to add to new block
                 $StraplineAccumulator = $false
                 $CurrentHeader = $HeaderMatch.Groups['header'].Value
             } else {
@@ -259,11 +289,7 @@ function Select-ReleaseNotes {
                     }
                 } else {
                     # Any non date/header line is added to the current block as defined by $CurrentHeader
-                    if ($Release.Blocks.$CurrentHeader) {
-                        $Release.Blocks.$CurrentHeader += [System.Environment]::NewLine + $Line
-                    } else {
-                        $Release.Blocks.$CurrentHeader = $Line
-                    }
+                    AddToBlock $Release $CurrentHeader $Line
                 }
             }
         }
@@ -271,7 +297,7 @@ function Select-ReleaseNotes {
 
     # Clean up and return the last $Release object being populated (if there is one)
     if ($Release) {
-        FinalizeRelease -Release $Release -ProductName $ProductName -CurrentHeader $CurrentHeader -Accumulator $Accumulator
+        FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator -ConvertBlocksToObject $convertBlocksToObject
         $Release
     }
 }
