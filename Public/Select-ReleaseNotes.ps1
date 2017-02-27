@@ -212,7 +212,6 @@ function Select-ReleaseNotes {
     $Accumulator = @{}
     $StraplineAccumulator = $false
     $Release = $nul
-    $CurrentBlockIndex = 0;
     
     foreach($Line in $Lines) {
         $Line = $Line.Trim()
