@@ -28,19 +28,8 @@ function TrimBlocks($release) {
     } 
 }
 
-function FinalizeRelease($release, [string]$productName, $accumulator, $convertBlocksToObject) {
+function FinalizeRelease($release, [string]$productName, $accumulator) {
     TrimBlocks($release)
-
-    if ($convertBlocksToObject) {
-        $blocksObject = @{}
-
-        foreach ($block in $release.Blocks) {
-            $name = $block.Name
-            $blocksObject.$name = $block.Value
-        }
-
-        $release.Blocks = $blocksObject
-    }
     
     # To see the accumulator in action un-comment this line
     # $accumulator.GetEnumerator() | sort {$_.Key} -Descending
@@ -202,9 +191,7 @@ function Select-ReleaseNotes {
         # Only return the top version block in the file
         [switch] $Latest,
         # Product name (if not using strapline this should be set to create a default summary based on at most 3 part version number)
-        [string] $ProductName = $nul,
-        # Return the Blocks collection as an ordered array refleting the order of sections in the input rather than an unordered dictionary
-        [switch] $BlocksInOrder
+        [string] $ProductName = $nul
     )
     if ($ReleaseNotesPath) {
         $Lines = Get-Content $ReleaseNotesPath
@@ -222,8 +209,6 @@ function Select-ReleaseNotes {
     $StraplineStartRegex = '^#+\s*Strapline\s*$'
     $StraplineRegex = '^\s*(?<priority>[0-9]+)\s*-\s*(?<feature>.*)\s*$'
 
-    $convertBlocksToObject = !$BlocksInOrder;
-
     $Accumulator = @{}
     $StraplineAccumulator = $false
     $Release = $nul
@@ -235,7 +220,7 @@ function Select-ReleaseNotes {
         if ($VersionMatch.Success) {
             # If a $Release already was being filled in - clean it up and return it
             if ($Release) {
-                FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator -ConvertBlocksToObject $convertBlocksToObject
+                FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator
 
                 # Return out of the pipeline
                 $Release
@@ -297,7 +282,7 @@ function Select-ReleaseNotes {
 
     # Clean up and return the last $Release object being populated (if there is one)
     if ($Release) {
-        FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator -ConvertBlocksToObject $convertBlocksToObject
+        FinalizeRelease -Release $Release -ProductName $ProductName -Accumulator $Accumulator
         $Release
     }
 }
