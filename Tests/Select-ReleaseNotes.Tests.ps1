@@ -263,4 +263,23 @@ Just trying to put any text here isn't allowed
             $v.Summary | Should Be 'SQL Doc 3.1.1'
         }
     }
+
+        InModuleScope RedGate.Build {
+        Context 'Blocks are in correct order with BlockArray' {
+            $v = Select-ReleaseNotes -ProductName "Test" -Latest -BlocksInOrder -ReleaseNotes @"
+## 3.1.1
+### Introduction
+Text
+
+### Features
+Text
+
+### Fixes
+Text
+"@
+            $v.Blocks[0].Name | Should Be 'Introduction'
+            $v.Blocks[1].Name | Should Be 'Features'
+            $v.Blocks[2].Name | Should Be 'Fixes'
+        }
+    }
 }
