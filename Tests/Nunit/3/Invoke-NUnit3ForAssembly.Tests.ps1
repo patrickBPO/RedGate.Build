@@ -9,5 +9,15 @@ Describe 'Invoke-NUnit3ForAssembly' {
             { Invoke-NUnit3ForAssembly -Assembly 'myassembly.dll' -NUnitVersion '2.6.4' } | Should Throw "Unexpected NUnit version '2.6.4'. This function only supports Nunit v3"
         }
     }
-
+    
+    Context 'Nunit 3.0.0' {
+        It 'should pass where clause as an argument' {
+            $ExpectedWhereClause = 'cat == TestWhereClause';
+            Mock -ModuleName RedGate.Build Invoke-DotCoverForExecutable { }
+            
+            Invoke-NUnit3ForAssembly -Assembly 'build.ps1' -NUnitVersion '3.0.0' -EnableCodeCoverage $true -Where $ExpectedWhereClause
+            
+            Assert-MockCalled Invoke-DotCoverForExecutable -ModuleName RedGate.Build -Times 1 -ParameterFilter {$TargetArguments -like "*$ExpectedWhereClause*"}
+        }
+    }
 }

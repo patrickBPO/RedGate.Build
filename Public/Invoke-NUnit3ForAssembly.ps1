@@ -62,6 +62,7 @@ function Invoke-NUnit3ForAssembly {
     $NunitArguments = Build-NUnit3CommandLineArguments `
       -AssemblyPath $AssemblyPath `
       -x86 $x86.IsPresent `
+      -Where $Where `
       -FrameworkVersion $FrameworkVersion `
       -TestResultFilenamePattern $TestResultFilenamePattern
 
